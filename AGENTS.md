@@ -42,8 +42,12 @@ Things that will bite you:
   in `main.ts` and in both init chains.
 - **The site is created once, at install**, by a `runUntilSuccess` chain — MariaDB has to be
   running for `bench new-site`, which is why this is not a plain `setupOnInit` step. The
-  database name is pinned so `Backups.withMysqlDump` knows what to dump; do not let bench
-  generate it.
+  database name is pinned rather than left to bench, which would otherwise generate a random
+  one per site — a fixed name keeps the schema identifiable to anything that has to name it.
+- **Backups copy volumes; they do not dump.** `Backups.withMysqlDump` cannot drive a MariaDB
+  11.x image (it calls `mysqld`/`mysqladmin`/`mysqldump`, which no longer exist — see
+  start-technologies#3763). Copying is sound only because StartOS stops the service for a
+  backup; if that ever stops being true, this has to become a logical dump.
 - **Bumping the image means a schema migration.** `bench migrate` runs on `kind === 'update'`
   inside init, where a failure rolls the update back. Do not move it to a oneshot in `main`.
 - **Credentials never go on a command line** — `bench` reads them from the environment so

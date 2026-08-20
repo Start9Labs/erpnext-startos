@@ -147,10 +147,18 @@ daemons waiting rather than crash-looping.
 
 ## Backups and Restore
 
-The ledger is dumped with `mysqldump` rather than copied from a live data directory. The
-`sites` volume is backed up as files — it holds uploads, the site config and the site
-encryption key, without which a database dump cannot be read. `main` carries the stored
-credentials. Restore replays the dump and the volumes.
+All three volumes are copied as files. StartOS stops the service for the duration of a
+backup, so MariaDB has shut down cleanly and its data directory is at rest — this is not a
+live-directory copy. `sites` holds uploads, the site config and the site encryption key,
+without which the database is unreadable; `main` carries the stored credentials.
+
+A logical dump via `sdk.Backups.withMysqlDump` would be the idiomatic choice, but it invokes
+`mysqld`, `mysqladmin`, `mysqldump`, `mysql` and `mysql_install_db`, and MariaDB 11.8 ships
+none of those names — only the `mariadb*` equivalents. Backups fail with "MySQL/MariaDB
+failed to become ready" until that is fixed upstream (start-technologies#3763).
+
+Verified end to end on StartOS 0.4.0: backup, uninstall, restore, then sign in with the
+pre-backup password and find the same records.
 
 ## What Is Unchanged from Upstream
 

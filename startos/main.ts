@@ -4,9 +4,9 @@ import { sdk } from './sdk'
 import {
   bench,
   configuratorScript,
-  frappeOwner,
   getErpnextSub,
   getFrontendEnv,
+  getSeedSub,
   getMariadbEnv,
   getMariadbSub,
   getRedisSub,
@@ -15,7 +15,7 @@ import {
   redisCachePort,
   redisQueuePort,
   redisReady,
-  sitesDir,
+  seedSitesScript,
   socketioPort,
   backendPort,
   uiPort,
@@ -38,6 +38,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   const mariadbSub = getMariadbSub(effects)
   const cacheSub = getRedisSub(effects, 'redis-cache')
   const queueSub = getRedisSub(effects, 'redis-queue')
+  const seedSub = getSeedSub(effects, 'seed-sites')
   const configuratorSub = getErpnextSub(effects, 'configurator')
   const backendSub = getErpnextSub(effects, 'backend')
   const websocketSub = getErpnextSub(effects, 'websocket')
@@ -48,12 +49,12 @@ export const main = sdk.setupMain(async ({ effects }) => {
 
   return (
     sdk.Daemons.of(effects)
-      // StartOS creates volume subpaths owned by root, and every frappe process
-      // runs as uid 1000, so the sites volume has to be handed over first.
-      .addOneshot('chown', {
-        subcontainer: configuratorSub,
+      // Seeds the sites volume from the image on first start and hands it to
+      // uid 1000; StartOS creates volume subpaths root-owned and empty.
+      .addOneshot('seed-sites', {
+        subcontainer: seedSub,
         exec: {
-          command: ['chown', '-R', frappeOwner, sitesDir],
+          command: ['bash', '-c', seedSitesScript],
           user: 'root',
         },
         requires: [],
@@ -96,7 +97,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
       .addOneshot('configurator', {
         subcontainer: configuratorSub,
         exec: { command: bench(configuratorScript) },
-        requires: ['chown', 'mariadb', 'redis-cache', 'redis-queue'],
+        requires: ['seed-sites', 'mariadb', 'redis-cache', 'redis-queue'],
       })
       .addDaemon('backend', {
         subcontainer: backendSub,

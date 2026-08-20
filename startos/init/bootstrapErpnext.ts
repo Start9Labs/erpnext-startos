@@ -7,18 +7,18 @@ import {
   bench,
   configuratorScript,
   dbName,
-  frappeOwner,
   getErpnextSub,
   getMariadbEnv,
   getMariadbSub,
   getRedisSub,
+  getSeedSub,
   mariadbFlags,
   mariadbReady,
   redisCachePort,
   redisQueuePort,
   redisReady,
+  seedSitesScript,
   siteName,
-  sitesDir,
 } from '../utils'
 
 // Creating the site initializes the schema and installs the ERPNext app, which
@@ -48,6 +48,7 @@ export const bootstrapErpnext = sdk.setupOnInit(
     const mariadbSub = getMariadbSub(effects, 'mariadb-init')
     const cacheSub = getRedisSub(effects, 'redis-cache-init')
     const queueSub = getRedisSub(effects, 'redis-queue-init')
+    const seedSub = getSeedSub(effects, 'seed-sites-init')
     const benchSub = getErpnextSub(effects, 'site-init')
 
     // Passwords go through the environment rather than the command line so they
@@ -63,10 +64,10 @@ export const bootstrapErpnext = sdk.setupOnInit(
     ].join(' ')
 
     await sdk.Daemons.of(effects)
-      .addOneshot('chown', {
-        subcontainer: benchSub,
+      .addOneshot('seed-sites', {
+        subcontainer: seedSub,
         exec: {
-          command: ['chown', '-R', frappeOwner, sitesDir],
+          command: ['bash', '-c', seedSitesScript],
           user: 'root',
         },
         requires: [],
@@ -103,7 +104,7 @@ export const bootstrapErpnext = sdk.setupOnInit(
       .addOneshot('configurator', {
         subcontainer: benchSub,
         exec: { command: bench(configuratorScript) },
-        requires: ['chown', 'mariadb', 'redis-cache', 'redis-queue'],
+        requires: ['seed-sites', 'mariadb', 'redis-cache', 'redis-queue'],
       })
       .addOneshot('new-site', {
         subcontainer: benchSub,
@@ -159,12 +160,13 @@ async function runSiteMigrate(
   const mariadbSub = getMariadbSub(effects, 'mariadb-migrate')
   const cacheSub = getRedisSub(effects, 'redis-cache-migrate')
   const queueSub = getRedisSub(effects, 'redis-queue-migrate')
+  const seedSub = getSeedSub(effects, 'seed-sites-migrate')
   const benchSub = getErpnextSub(effects, 'site-migrate')
 
   await sdk.Daemons.of(effects)
-    .addOneshot('chown', {
-      subcontainer: benchSub,
-      exec: { command: ['chown', '-R', frappeOwner, sitesDir], user: 'root' },
+    .addOneshot('seed-sites', {
+      subcontainer: seedSub,
+      exec: { command: ['bash', '-c', seedSitesScript], user: 'root' },
       requires: [],
     })
     .addDaemon('mariadb', {
@@ -195,7 +197,7 @@ async function runSiteMigrate(
     .addOneshot('configurator', {
       subcontainer: benchSub,
       exec: { command: bench(configuratorScript) },
-      requires: ['chown', 'mariadb', 'redis-cache', 'redis-queue'],
+      requires: ['seed-sites', 'mariadb', 'redis-cache', 'redis-queue'],
     })
     .addOneshot('migrate', {
       subcontainer: benchSub,

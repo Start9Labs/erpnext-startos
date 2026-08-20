@@ -38,6 +38,34 @@ export const dbMount = sdk.Mounts.of().mountVolume({
 export const getErpnextSub = (effects: T.Effects, name: string) =>
   sdk.SubContainer.of(effects, { imageId: 'erpnext' }, sitesMount, name)
 
+// Where the seeding subcontainer mounts the sites volume. It has to differ from
+// sitesDir: mounting the volume over its own path hides the image's copy of the
+// directory, which is exactly what we need to read from.
+export const seedMountpoint = '/seed'
+
+export const getSeedSub = (effects: T.Effects, name: string) =>
+  sdk.SubContainer.of(
+    effects,
+    { imageId: 'erpnext' },
+    sdk.Mounts.of().mountVolume({
+      volumeId: 'sites',
+      subpath: null,
+      mountpoint: seedMountpoint,
+      readonly: false,
+    }),
+    name,
+  )
+
+// The image ships sites/ prepopulated (common_site_config.json, apps.txt,
+// apps.json) and Docker copies that into a fresh named volume on first use.
+// StartOS volumes start genuinely empty and mask the image's directory, so
+// `bench set-config` fails on a missing common_site_config.json unless we seed
+// it ourselves. `cp -n` never clobbers, so this is safe on every later start.
+export const seedSitesScript = [
+  `cp -rn ${sitesDir}/. ${seedMountpoint}/ 2>/dev/null || true`,
+  `chown -R ${frappeOwner} ${seedMountpoint}`,
+].join('; ')
+
 export const getMariadbSub = (effects: T.Effects, name = 'mariadb') =>
   sdk.SubContainer.of(effects, { imageId: 'mariadb' }, dbMount, name)
 
@@ -110,6 +138,6 @@ export const mariadbReady = (sub: Sub) => async () => {
     : { result: 'loading' as const, message: null }
 }
 
-// Fixed so backups know which schema to dump; bench would otherwise generate a
-// random database name per site.
+// Pinned rather than left to bench, which generates a random database name per
+// site — a fixed name keeps the schema identifiable.
 export const dbName = 'erpnext'
