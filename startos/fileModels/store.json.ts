@@ -1,4 +1,4 @@
-import { FileHelper, z } from '@start9labs/start-sdk'
+import { FileHelper, smtpShape, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
 const shape = z.object({
@@ -8,6 +8,9 @@ const shape = z.object({
   // MariaDB root password. Internal only: the user never sees it, but bench
   // needs it to create the site and to run schema migrations.
   dbRootPassword: z.string().optional().catch(undefined),
+  // Defaults to disabled through .catch(), so there is nothing to seed at
+  // install and a corrupt value repairs itself to "no email".
+  smtp: smtpShape.catch({ selection: 'disabled', value: {} }),
 })
 
 export const storeJson = FileHelper.json(

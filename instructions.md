@@ -43,6 +43,27 @@ API key under your user record (**Settings → API Access**). Payroll journals e
 payroll provider, and itemized purchases exported from a supplier, can both be posted this
 way or imported as spreadsheets under **Data Import**.
 
+## Sending Email
+
+ERPNext emails invoices, quotes and notifications. Run the **Configure Email (SMTP)** action
+and pick one of:
+
+- **Disabled** — ERPNext sends no email at all. This is the default.
+- **System** — use the SMTP server configured once for your whole server in StartOS. Available
+  only if you have set one up there.
+- **Custom** — your own provider. Pick your provider (or "Other"), then give the host, the
+  port and whether it uses TLS or STARTTLS, the address mail should come from, and your
+  username and password.
+
+The setting is applied the next time ERPNext starts, so restart it afterwards.
+
+If the details are wrong, or your mail provider cannot be reached, ERPNext will refuse them
+and carry on with email switched off — it will not stop the service from running. Check the
+service logs for a line beginning `[smtp]`, fix the settings, and restart.
+
+You can still create your own Email Account inside ERPNext instead. If you mark one as the
+default outgoing account, ERPNext uses yours rather than the one StartOS manages.
+
 ## Changing Your Password
 
 If you lose the Administrator password, stop ERPNext and run the **Reset Administrator

@@ -26,6 +26,9 @@ const dict = {
   Ready: 16,
   'Not ready': 17,
   'Updating ERPNext': 18,
+  // actions/manageSmtp.ts
+  'Configure Email (SMTP)': 19,
+  'Choose how ERPNext sends email — invoices, notifications and password resets. Use the StartOS system SMTP server, your own provider, or turn email off.': 20,
 } as const
 
 /**

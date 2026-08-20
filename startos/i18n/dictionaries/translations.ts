@@ -21,6 +21,8 @@ export default {
     16: 'Listo',
     17: 'No listo',
     18: 'Actualizando ERPNext',
+    19: 'Configurar correo (SMTP)',
+    20: 'Elige cómo envía ERPNext los correos — facturas, notificaciones y restablecimientos de contraseña. Usa el servidor SMTP del sistema de StartOS, tu propio proveedor, o desactiva el correo.',
   },
   de_DE: {
     0: 'Starte ERPNext!',
@@ -42,6 +44,8 @@ export default {
     16: 'Bereit',
     17: 'Nicht bereit',
     18: 'ERPNext wird aktualisiert',
+    19: 'E-Mail einrichten (SMTP)',
+    20: 'Lege fest, wie ERPNext E-Mails versendet — Rechnungen, Benachrichtigungen und Passwort-Zurücksetzungen. Nutze den System-SMTP-Server von StartOS, deinen eigenen Anbieter, oder schalte E-Mail ab.',
   },
   pl_PL: {
     0: 'Uruchamianie ERPNext!',
@@ -63,6 +67,8 @@ export default {
     16: 'Gotowy',
     17: 'Niegotowy',
     18: 'Aktualizowanie ERPNext',
+    19: 'Konfiguracja poczty (SMTP)',
+    20: 'Wybierz, jak ERPNext wysyła wiadomości — faktury, powiadomienia i resetowanie haseł. Użyj systemowego serwera SMTP StartOS, własnego dostawcy albo wyłącz pocztę.',
   },
   fr_FR: {
     0: 'Démarrage de ERPNext !',
@@ -84,5 +90,7 @@ export default {
     16: 'Prêt',
     17: 'Pas prêt',
     18: "Mise à jour d'ERPNext",
+    19: "Configurer l'e-mail (SMTP)",
+    20: "Choisissez comment ERPNext envoie les e-mails — factures, notifications et réinitialisations de mot de passe. Utilisez le serveur SMTP système de StartOS, votre propre fournisseur, ou désactivez l'e-mail.",
   },
 } satisfies Record<string, LangDict>

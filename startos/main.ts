@@ -3,6 +3,7 @@ import { i18n } from './i18n'
 import { sdk } from './sdk'
 import {
   bench,
+  buildSmtpFields,
   configuratorScript,
   getErpnextSub,
   getFrontendEnv,
@@ -15,7 +16,9 @@ import {
   redisCachePort,
   redisQueuePort,
   redisReady,
+  resolveSmtp,
   seedSitesScript,
+  smtpApplyScript,
   socketioPort,
   backendPort,
   uiPort,
@@ -46,6 +49,9 @@ export const main = sdk.setupMain(async ({ effects }) => {
   const queueShortSub = getErpnextSub(effects, 'queue-short')
   const queueLongSub = getErpnextSub(effects, 'queue-long')
   const frontendSub = getErpnextSub(effects, 'frontend')
+  const smtpSub = getErpnextSub(effects, 'smtp')
+
+  const smtp = await resolveSmtp(effects, store.smtp)
 
   return (
     sdk.Daemons.of(effects)
@@ -98,6 +104,18 @@ export const main = sdk.setupMain(async ({ effects }) => {
         subcontainer: configuratorSub,
         exec: { command: bench(configuratorScript) },
         requires: ['seed-sites', 'mariadb', 'redis-cache', 'redis-queue'],
+      })
+      // Nothing requires this, so a relay that is down or misconfigured cannot
+      // hold up the service — the oneshot reports the problem and exits clean.
+      .addOneshot('smtp', {
+        subcontainer: smtpSub,
+        exec: {
+          command: bench(smtpApplyScript),
+          env: {
+            SMTP_FIELDS: smtp ? JSON.stringify(buildSmtpFields(smtp)) : '',
+          },
+        },
+        requires: ['configurator'],
       })
       .addDaemon('backend', {
         subcontainer: backendSub,

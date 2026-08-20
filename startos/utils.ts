@@ -1,4 +1,4 @@
-import { T } from '@start9labs/start-sdk'
+import { SmtpSelection, T } from '@start9labs/start-sdk'
 import { sdk } from './sdk'
 
 // A package's subcontainers share one network namespace, so every process below
@@ -141,3 +141,95 @@ export const mariadbReady = (sub: Sub) => async () => {
 // Pinned rather than left to bench, which generates a random database name per
 // site — a fixed name keeps the schema identifiable.
 export const dbName = 'erpnext'
+
+// The Email Account row this package owns. Anything the user creates by hand in
+// ERPNext is left alone; a user-made default outgoing account even wins over
+// this one (frappe: EmailAccount.find_default_outgoing).
+export const smtpAccountName = 'StartOS'
+
+/**
+ * Resolve the stored selection into concrete credentials. `system` reads the
+ * SMTP server configured once for the whole box in StartOS; `custom` is the
+ * user's own relay; `disabled` means no outgoing mail.
+ */
+export const resolveSmtp = async (
+  effects: T.Effects,
+  smtp: SmtpSelection,
+): Promise<T.SmtpValue | null> => {
+  if (smtp.selection === 'system') {
+    const system = await sdk.getSystemSmtp(effects).const()
+    if (system && smtp.value.customFrom) system.from = smtp.value.customFrom
+    return system
+  }
+  if (smtp.selection === 'custom') {
+    const p = smtp.value.provider.value
+    return {
+      host: p.host,
+      port: Number(p.security.value.port),
+      from: p.from,
+      username: p.username,
+      password: p.password ?? null,
+      security: p.security.selection,
+    }
+  }
+  return null
+}
+
+/**
+ * Field values for the Email Account doctype. `use_tls` is STARTTLS and
+ * `use_ssl_for_outgoing` is implicit TLS — frappe reads exactly these two into
+ * its SMTP client (EmailAccount.sendmail_config), so they must not both be set.
+ * This is why the settings are written as a document rather than into site
+ * config: the site-config path frappe offers has no key for implicit TLS, which
+ * would silently strand everyone on a 465-only relay.
+ */
+export const buildSmtpFields = (smtp: T.SmtpValue) => {
+  const separateLogin = !!smtp.username && smtp.username !== smtp.from
+  return {
+    email_id: smtp.from,
+    smtp_server: smtp.host,
+    smtp_port: String(smtp.port),
+    use_tls: smtp.security === 'starttls' ? 1 : 0,
+    use_ssl_for_outgoing: smtp.security === 'tls' ? 1 : 0,
+    login_id_is_different: separateLogin ? 1 : 0,
+    ...(separateLogin ? { login_id: smtp.username } : {}),
+    // A relay that takes no credentials has to say so explicitly, or frappe
+    // refuses to save the account at all.
+    ...(smtp.password
+      ? { password: smtp.password }
+      : { no_smtp_authentication: 1 }),
+    enable_outgoing: 1,
+    default_outgoing: 1,
+    enable_incoming: 0,
+    always_use_account_email_id_as_sender: 1,
+  }
+}
+
+/**
+ * Upserts the managed account, or disables it when email is turned off.
+ *
+ * The credentials arrive in SMTP_FIELDS and are written to a file that bench
+ * reads, so the password never appears in a command line. set-value updates an
+ * existing row and falls through to insert the first time; the account is
+ * disabled rather than deleted, because Email Queue rows link to it and frappe
+ * refuses to delete a linked document.
+ *
+ * ERPNext opens a real SMTP session when saving an outgoing account, so bad
+ * credentials or a relay that is merely down will fail here. That must never
+ * stop ERPNext from starting, so the failure is reported and swallowed.
+ */
+export const smtpApplyScript = [
+  `if [ -n "$SMTP_FIELDS" ]; then`,
+  `printf '%s' "$SMTP_FIELDS" > /tmp/smtp.json;`,
+  `bench --site ${siteName} execute frappe.client.set_value`,
+  `--args '["Email Account","${smtpAccountName}",__import__("json").load(open("/tmp/smtp.json"))]'`,
+  `|| bench --site ${siteName} execute frappe.client.insert`,
+  `--args '[dict(__import__("json").load(open("/tmp/smtp.json")),doctype="Email Account",email_account_name="${smtpAccountName}")]'`,
+  `|| echo "[smtp] ERPNext rejected the email settings — it tests the connection when saving an outgoing account. Mail is left unconfigured; check the credentials and that the relay is reachable, then restart." >&2;`,
+  `rm -f /tmp/smtp.json;`,
+  `else`,
+  `bench --site ${siteName} execute frappe.client.set_value`,
+  `--args '["Email Account","${smtpAccountName}",{"enable_outgoing":0,"default_outgoing":0}]' >/dev/null 2>&1 || true;`,
+  `fi;`,
+  `exit 0`,
+].join(' ')

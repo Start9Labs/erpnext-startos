@@ -32,16 +32,18 @@ Three upstream images, all pinned by tag in `startos/manifest/index.ts`, all bui
 
 | Image     | Source            | Role                                            |
 | --------- | ----------------- | ----------------------------------------------- |
-| `erpnext` | `frappe/erpnext`  | Frappe framework + ERPNext app; six containers  |
+| `erpnext` | `frappe/erpnext`  | Frappe framework + ERPNext app; nine containers |
 | `mariadb` | `mariadb`         | The database holding the ledger                 |
 | `redis`   | `redis`           | Cache and job queue                             |
 
 ERPNext is not one process. This package runs the same process split as upstream's
-`frappe_docker` compose file, as nine subcontainers:
+`frappe_docker` compose file, as twelve subcontainers:
 
 | Subcontainer  | Kind    | Command                              | Purpose                                    |
 | ------------- | ------- | ------------------------------------ | ------------------------------------------ |
-| `configurator`| oneshot | `bench set-config …`                 | Writes bench-wide config; also runs `chown` |
+| `seed-sites`  | oneshot | `cp -rn` + `chown`                   | Seeds the sites volume from the image      |
+| `configurator`| oneshot | `bench set-config …`                 | Writes bench-wide config                   |
+| `smtp`        | oneshot | `bench execute frappe.client.*`      | Applies the email settings                 |
 | `mariadb`     | daemon  | image entrypoint                     | Database                                   |
 | `redis-cache` | daemon  | `redis-server --port 6379`           | Frappe cache                               |
 | `redis-queue` | daemon  | `redis-server --port 6380`           | RQ job queue and socket.io pub/sub         |
@@ -75,14 +77,16 @@ nginx 8080.
 | `db`    | `/var/lib/mysql`                | MariaDB data directory                                       |
 | `main`  | package store                   | `store.json`                                                 |
 
-The `sites` volume is created root-owned by StartOS while every frappe process runs as uid
-1000, so a `chown` oneshot hands it over before anything else starts.
+The `sites` volume is created root-owned and empty by StartOS while every frappe process runs
+as uid 1000, so the `seed-sites` oneshot fills it from the image and hands it over before
+anything else starts.
 
 ## File Models
 
 `store.json` (`startos/fileModels/store.json.ts`) on the `main` volume, holding
-`adminPassword` and `dbRootPassword`. Both are written once at install. Nothing else in the
-package rewrites it, and ERPNext itself never reads it — it is the package's own record.
+`adminPassword`, `dbRootPassword` and `smtp`. The two credentials are written once at install;
+`smtp` is written by the Configure Email action and defaults to disabled. ERPNext itself never
+reads this file — it is the package's own record.
 
 ERPNext's own configuration lives in `sites/common_site_config.json` inside the `sites`
 volume. The `configurator` oneshot rewrites the host, port and redis entries on **every**
@@ -121,6 +125,7 @@ setup wizard (company, fiscal year, chart of accounts, currency).
 | -------------------------------- | -------------------------------------- | ---------------------------------------------------------------------- |
 | View Administrator Credentials   | After install, or whenever forgotten   | Reads and displays the stored password. Changes nothing. Safe to repeat |
 | Reset Administrator Password     | Password lost or should be rotated     | Generates a new password, applies it with `bench set-admin-password`, stores and returns it |
+| Configure Email (SMTP)           | To send invoices and notifications     | Stores the choice of StartOS system SMTP, a custom relay, or disabled. Applied on next start |
 
 Reset runs only while the service is stopped: ERPNext keeps the password hashed in its
 database, so the action brings up its own MariaDB, applies the change, and tears it down.
@@ -171,7 +176,14 @@ the cache, the site bootstrap, credential handling, backups and the network inte
 
 - **Single site.** Frappe supports many sites per bench; this package creates and serves
   exactly one, with a fixed database name so backups know what to dump.
-- **No email out of the box.** Configure an outgoing mail account inside ERPNext.
+- **Email settings apply on the next start.** The Configure Email action stores the choice;
+  the `smtp` oneshot writes it into ERPNext when the service starts.
+- **Email settings are validated by ERPNext, not by StartOS.** ERPNext opens a real SMTP
+  session when it saves an outgoing account, so a wrong password or an unreachable relay is
+  only discovered at start. It is reported in the service log as a `[smtp]` line and mail is
+  left unconfigured — it never blocks startup.
+- **A mail account you create yourself wins.** If you set your own default outgoing Email
+  Account inside ERPNext, ERPNext uses it in preference to the one this package manages.
 - **Password reset is offline.** See Actions above.
 - **`bench` is not exposed as an action.** Administrative `bench` commands can be run with
   `start-cli package attach erpnext -n backend -- bench --site <site> <command>`.
@@ -194,7 +206,9 @@ image: 'frappe/erpnext'
 architectures: ['x86_64', 'aarch64']
 subcontainers:
   [
+    'seed-sites',
     'configurator',
+    'smtp',
     'mariadb',
     'redis-cache',
     'redis-queue',
@@ -230,7 +244,7 @@ startos_managed_env_vars:
   ]
 dependencies: []
 interfaces: { ui: 'http web interface' }
-actions: ['get-admin-credentials', 'reset-admin-password']
+actions: ['get-admin-credentials', 'reset-admin-password', 'manage-smtp']
 tasks: ['critical: view administrator credentials after install']
 health_checks:
   ['Web Interface', 'mariadb', 'redis-cache', 'redis-queue', 'backend', 'websocket']
