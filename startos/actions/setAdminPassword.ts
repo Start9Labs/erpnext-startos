@@ -1,0 +1,103 @@
+import { utils } from '@start9labs/start-sdk'
+import { storeJson } from '../fileModels/store.json'
+import { i18n } from '../i18n'
+import { sdk } from '../sdk'
+import {
+  bench,
+  getErpnextSub,
+  getMariadbEnv,
+  getMariadbSub,
+  mariadbFlags,
+  mariadbReady,
+  siteName,
+} from '../utils'
+
+const SET_PASSWORD_TIMEOUT = 300_000
+
+export const setAdminPassword = sdk.Action.withoutInput(
+  'set-admin-password',
+
+  async () => ({
+    name: i18n('Set Administrator Password'),
+    description: i18n(
+      '<p>Generate a new random password for the ERPNext Administrator account and apply it.</p><p>This action can only run while ERPNext is stopped, because it starts its own copy of the database to apply the change.</p>',
+    ),
+    warning: null,
+    allowedStatuses: 'only-stopped',
+    group: null,
+    visibility: 'enabled',
+  }),
+
+  async ({ effects }) => {
+    const store = await storeJson.read().const(effects)
+    if (!store?.dbRootPassword) {
+      throw new Error(
+        'ERPNext is not initialized yet, so there is no account to set a password on.',
+      )
+    }
+
+    const adminPassword = utils.getDefaultString({
+      charset: 'a-z,A-Z,0-9',
+      len: 24,
+    })
+
+    const mariadbSub = getMariadbSub(effects, 'mariadb-set-password')
+
+    await sdk.Daemons.of(effects)
+      .addDaemon('mariadb', {
+        subcontainer: mariadbSub,
+        exec: {
+          command: sdk.useEntrypoint(mariadbFlags),
+          env: getMariadbEnv(store.dbRootPassword),
+        },
+        ready: {
+          display: null,
+          gracePeriod: 120_000,
+          fn: mariadbReady(mariadbSub),
+        },
+        requires: [],
+      })
+      .addOneshot('set-password', {
+        subcontainer: getErpnextSub(effects, 'bench-set-password'),
+        exec: {
+          command: bench(
+            `bench --site ${siteName} set-admin-password "$NEW_ADMIN_PASSWORD"`,
+          ),
+          env: { NEW_ADMIN_PASSWORD: adminPassword },
+        },
+        requires: ['mariadb'],
+      })
+      .runUntilSuccess(SET_PASSWORD_TIMEOUT)
+
+    await storeJson.merge(effects, { adminPassword })
+
+    return {
+      version: '1',
+      title: i18n('ERPNext Administrator Credentials'),
+      message: i18n('Use these credentials to sign in to ERPNext.'),
+      result: {
+        type: 'group',
+        value: [
+          {
+            type: 'single',
+            name: i18n('Username'),
+            description: null,
+            value: 'Administrator',
+            masked: false,
+            copyable: true,
+            qr: false,
+          },
+          {
+            type: 'single',
+            name: i18n('Password'),
+            description: null,
+            value: adminPassword,
+            masked: true,
+            copyable: true,
+            qr: false,
+          },
+        ],
+      },
+    }
+  },
+)

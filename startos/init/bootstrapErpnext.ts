@@ -1,0 +1,176 @@
+import { T, utils } from '@start9labs/start-sdk'
+import { storeJson } from '../fileModels/store.json'
+import { i18n } from '../i18n'
+import { sdk } from '../sdk'
+import {
+  bench,
+  configuratorScript,
+  dbName,
+  getErpnextSub,
+  getMariadbEnv,
+  getMariadbSub,
+  getRedisSub,
+  getSeedSub,
+  mariadbFlags,
+  mariadbReady,
+  redisCachePort,
+  redisQueuePort,
+  redisReady,
+  seedSitesScript,
+  siteName,
+} from '../utils'
+
+// Creating the site builds the schema and installs the ERPNext app.
+const INSTALL_TIMEOUT = 1_800_000
+
+export const bootstrapErpnext = sdk.setupOnInit(
+  async (effects, kind, progress) => {
+    if (kind === 'update') {
+      const migrating = progress.addPhase(i18n('Updating ERPNext'))
+      migrating.start()
+      await runSiteMigrate(effects)
+      migrating.complete()
+      return
+    }
+    if (kind !== 'install') return
+
+    const installing = progress.addPhase(i18n('Installing ERPNext'))
+    installing.start()
+    await createSite(effects)
+    installing.complete()
+  },
+)
+
+async function createSite(effects: T.Effects): Promise<void> {
+  const throwawayAdminPassword = utils.getDefaultString({
+    charset: 'a-z,A-Z,0-9',
+    len: 24,
+  })
+  const dbRootPassword = utils.getDefaultString({
+    charset: 'a-z,A-Z,0-9',
+    len: 32,
+  })
+
+  const mariadbSub = getMariadbSub(effects, 'mariadb-init')
+  const cacheSub = getRedisSub(effects, 'redis-cache-init')
+  const queueSub = getRedisSub(effects, 'redis-queue-init')
+  const seedSub = getSeedSub(effects, 'seed-sites-init')
+  const benchSub = getErpnextSub(effects, 'site-init')
+
+  // Passwords go through the environment so they stay out of the process table.
+  const newSite = [
+    'bench new-site',
+    '--mariadb-user-host-login-scope=%',
+    '--db-root-password "$DB_ROOT_PASSWORD"',
+    '--admin-password "$ADMIN_PASSWORD"',
+    `--db-name ${dbName}`,
+    '--install-app erpnext',
+    siteName,
+  ].join(' ')
+
+  await sdk.Daemons.of(effects)
+    .addOneshot('seed-sites', {
+      subcontainer: seedSub,
+      exec: { command: ['bash', '-c', seedSitesScript], user: 'root' },
+      requires: [],
+    })
+    .addDaemon('mariadb', {
+      subcontainer: mariadbSub,
+      exec: {
+        command: sdk.useEntrypoint(mariadbFlags),
+        env: getMariadbEnv(dbRootPassword),
+      },
+      ready: {
+        display: null,
+        gracePeriod: 120_000,
+        fn: mariadbReady(mariadbSub),
+      },
+      requires: [],
+    })
+    .addDaemon('redis-cache', {
+      subcontainer: cacheSub,
+      exec: { command: sdk.useEntrypoint(['--port', String(redisCachePort)]) },
+      ready: { display: null, fn: redisReady(cacheSub, redisCachePort) },
+      requires: [],
+    })
+    .addDaemon('redis-queue', {
+      subcontainer: queueSub,
+      exec: { command: sdk.useEntrypoint(['--port', String(redisQueuePort)]) },
+      ready: { display: null, fn: redisReady(queueSub, redisQueuePort) },
+      requires: [],
+    })
+    .addOneshot('configurator', {
+      subcontainer: benchSub,
+      exec: { command: bench(configuratorScript) },
+      requires: ['seed-sites', 'mariadb', 'redis-cache', 'redis-queue'],
+    })
+    .addOneshot('new-site', {
+      subcontainer: benchSub,
+      exec: {
+        command: bench(`${newSite} && bench use ${siteName}`),
+        env: {
+          DB_ROOT_PASSWORD: dbRootPassword,
+          ADMIN_PASSWORD: throwawayAdminPassword,
+        },
+      },
+      requires: ['configurator'],
+    })
+    .runUntilSuccess(INSTALL_TIMEOUT)
+
+  await storeJson.merge(effects, { dbRootPassword })
+}
+
+// Runs in init, where StartOS has snapshotted the volumes, so a failed migration rolls the update back.
+async function runSiteMigrate(effects: T.Effects): Promise<void> {
+  const store = await storeJson.read().const(effects)
+  if (!store?.dbRootPassword) return
+
+  const mariadbSub = getMariadbSub(effects, 'mariadb-migrate')
+  const cacheSub = getRedisSub(effects, 'redis-cache-migrate')
+  const queueSub = getRedisSub(effects, 'redis-queue-migrate')
+  const seedSub = getSeedSub(effects, 'seed-sites-migrate')
+  const benchSub = getErpnextSub(effects, 'site-migrate')
+
+  await sdk.Daemons.of(effects)
+    .addOneshot('seed-sites', {
+      subcontainer: seedSub,
+      exec: { command: ['bash', '-c', seedSitesScript], user: 'root' },
+      requires: [],
+    })
+    .addDaemon('mariadb', {
+      subcontainer: mariadbSub,
+      exec: {
+        command: sdk.useEntrypoint(mariadbFlags),
+        env: getMariadbEnv(store.dbRootPassword),
+      },
+      ready: {
+        display: null,
+        gracePeriod: 120_000,
+        fn: mariadbReady(mariadbSub),
+      },
+      requires: [],
+    })
+    .addDaemon('redis-cache', {
+      subcontainer: cacheSub,
+      exec: { command: sdk.useEntrypoint(['--port', String(redisCachePort)]) },
+      ready: { display: null, fn: redisReady(cacheSub, redisCachePort) },
+      requires: [],
+    })
+    .addDaemon('redis-queue', {
+      subcontainer: queueSub,
+      exec: { command: sdk.useEntrypoint(['--port', String(redisQueuePort)]) },
+      ready: { display: null, fn: redisReady(queueSub, redisQueuePort) },
+      requires: [],
+    })
+    .addOneshot('configurator', {
+      subcontainer: benchSub,
+      exec: { command: bench(configuratorScript) },
+      requires: ['seed-sites', 'mariadb', 'redis-cache', 'redis-queue'],
+    })
+    .addOneshot('migrate', {
+      subcontainer: benchSub,
+      exec: { command: bench(`bench --site ${siteName} migrate`) },
+      requires: ['configurator'],
+    })
+    .runUntilSuccess(INSTALL_TIMEOUT)
+}
