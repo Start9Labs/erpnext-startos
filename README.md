@@ -9,6 +9,11 @@
 > documentation is accurate and fully applicable — see the Documentation section of
 > `instructions.md` for links.
 
+ERPNext is a double-entry accounting and business management suite built on the Frappe
+framework — <https://github.com/frappe/erpnext>.
+
+---
+
 ## Table of Contents
 
 - [Image and Container Runtime](#image-and-container-runtime)
@@ -21,38 +26,47 @@
 - [Tasks](#tasks)
 - [Health Checks](#health-checks)
 - [Backups and Restore](#backups-and-restore)
-- [What Is Unchanged from Upstream](#what-is-unchanged-from-upstream)
 - [Limitations and Differences](#limitations-and-differences)
-- [Contributing](#contributing)
+- [Quick Reference for AI Consumers](#quick-reference-for-ai-consumers)
+
+---
 
 ## Image and Container Runtime
 
-Three upstream images, all pinned by tag in `startos/manifest/index.ts`, all built for
-`x86_64` and `aarch64`:
+Three upstream images, unmodified, pinned by tag in `startos/manifest/index.ts` and built
+for `x86_64` and `aarch64`. Each runs its stock entrypoint except where a command is named
+below.
 
-| Image     | Source            | Role                                            |
-| --------- | ----------------- | ----------------------------------------------- |
-| `erpnext` | `frappe/erpnext`  | Frappe framework + ERPNext app; nine containers |
-| `mariadb` | `mariadb`         | The database holding the ledger                 |
-| `redis`   | `redis`           | Cache and job queue                             |
+| Image     | Source           | Role                                             |
+| --------- | ---------------- | ------------------------------------------------ |
+| `erpnext` | `frappe/erpnext` | Frappe framework + ERPNext app; nine subcontainers |
+| `mariadb` | `mariadb`        | The database holding the ledger                  |
+| `redis`   | `redis`          | Cache and job queue                              |
 
 ERPNext is not one process. This package runs the same process split as upstream's
-`frappe_docker` compose file, as twelve subcontainers:
+`frappe_docker` compose file, as twelve subcontainers. Attach to any of them with
+`start-cli package attach erpnext -n <name>`.
 
-| Subcontainer  | Kind    | Command                              | Purpose                                    |
-| ------------- | ------- | ------------------------------------ | ------------------------------------------ |
-| `seed-sites`  | oneshot | `cp -rn` + `chown`                   | Seeds the sites volume from the image      |
-| `configurator`| oneshot | `bench set-config …`                 | Writes bench-wide config                   |
-| `smtp`        | oneshot | `bench execute frappe.client.*`      | Applies the email settings                 |
-| `mariadb`     | daemon  | image entrypoint                     | Database                                   |
-| `redis-cache` | daemon  | `redis-server --port 6379`           | Frappe cache                               |
-| `redis-queue` | daemon  | `redis-server --port 6380`           | RQ job queue and socket.io pub/sub         |
-| `backend`     | daemon  | image entrypoint (gunicorn)          | Application server                         |
-| `websocket`   | daemon  | `node …/frappe/socketio.js`          | Realtime updates                           |
-| `scheduler`   | daemon  | `bench schedule`                     | Cron-like scheduled jobs                   |
-| `queue-short` | daemon  | `bench worker --queue short,default` | Short background jobs                      |
-| `queue-long`  | daemon  | `bench worker --queue long,default,short` | Long background jobs                  |
-| `frontend`    | daemon  | `nginx-entrypoint.sh`                | nginx; serves assets, proxies the rest     |
+| Subcontainer   | Kind    | Command                                   | Purpose                                |
+| -------------- | ------- | ----------------------------------------- | -------------------------------------- |
+| `seed-sites`   | oneshot | `cp -rn` + `chown`                        | Seeds the sites volume from the image  |
+| `configurator` | oneshot | `bench set-config …`                      | Writes bench-wide config               |
+| `smtp`         | oneshot | `bench execute frappe.client.*`           | Applies the email settings             |
+| `mariadb`      | daemon  | image entrypoint                          | Database                               |
+| `redis-cache`  | daemon  | `redis-server --port 6379`                | Frappe cache                           |
+| `redis-queue`  | daemon  | `redis-server --port 6380`                | RQ job queue and socket.io pub/sub     |
+| `backend`      | daemon  | image entrypoint (gunicorn)               | Application server                     |
+| `websocket`    | daemon  | `node …/frappe/socketio.js`               | Realtime updates                       |
+| `scheduler`    | daemon  | `bench schedule`                          | Cron-like scheduled jobs               |
+| `queue-short`  | daemon  | `bench worker --queue short,default`      | Short background jobs                  |
+| `queue-long`   | daemon  | `bench worker --queue long,default,short` | Long background jobs                   |
+| `frontend`     | daemon  | `nginx-entrypoint.sh`                     | nginx; serves assets, proxies the rest |
+
+Install, update and the Set Administrator Password action each run their own short-lived
+copies of these outside the running service, and those are the names their logs carry:
+`seed-sites-init` / `mariadb-init` / `redis-cache-init` / `redis-queue-init` / `site-init`
+at install, the same set suffixed `-migrate` on update, and `mariadb-set-password` /
+`bench-set-password` for the action.
 
 All subcontainers in a package share one network namespace, so they address each other on
 `127.0.0.1`. Ports are fixed: MariaDB 3306, redis 6379/6380, backend 8000, websocket 9000,
@@ -66,31 +80,43 @@ nginx 8080.
 - `frontend`: `BACKEND`, `SOCKETIO`, `FRAPPE_SITE_NAME_HEADER`, `UPSTREAM_REAL_IP_ADDRESS`,
   `UPSTREAM_REAL_IP_HEADER`, `UPSTREAM_REAL_IP_RECURSIVE`, `PROXY_READ_TIMEOUT`,
   `CLIENT_MAX_BODY_SIZE`
-- install/reset only: `DB_ROOT_PASSWORD`, `ADMIN_PASSWORD`, `NEW_ADMIN_PASSWORD` — passed
-  through the environment so credentials never appear in a command line or the service log
+- `smtp`: `SMTP_FIELDS` — the Email Account field set, as JSON
+- install and password-set only: `DB_ROOT_PASSWORD`, `ADMIN_PASSWORD`,
+  `NEW_ADMIN_PASSWORD` — passed through the environment so credentials never appear in a
+  command line or the service log
 
 ## Volume and Data Layout
 
-| Volume  | Mountpoint                      | Contents                                                     |
-| ------- | ------------------------------- | ------------------------------------------------------------ |
-| `sites` | `/home/frappe/frappe-bench/sites` | Site config, the encryption key, uploaded files, built assets |
-| `db`    | `/var/lib/mysql`                | MariaDB data directory                                       |
-| `main`  | package store                   | `store.json`                                                 |
+Three volumes, all included in backups. The ledger itself is MariaDB's data directory on
+`db`; everything a restore needs to read it is on `sites`.
 
-The `sites` volume is created root-owned and empty by StartOS while every frappe process runs
-as uid 1000, so the `seed-sites` oneshot fills it from the image and hands it over before
-anything else starts.
+| Volume  | Mountpoint                        | Contents                                                      |
+| ------- | --------------------------------- | ------------------------------------------------------------- |
+| `sites` | `/home/frappe/frappe-bench/sites` | Site config, the encryption key, uploaded files, built assets |
+| `db`    | `/var/lib/mysql`                  | MariaDB data directory                                        |
+| `main`  | package store                     | `store.json`                                                  |
+
+The `sites` volume is created root-owned and empty by StartOS while every frappe process
+runs as uid 1000, so the `seed-sites` oneshot fills it from the image and hands it over
+before anything else starts. It is a `cp -rn`, so it never overwrites an existing file and
+is a no-op on every later start.
 
 ## File Models
 
-`store.json` (`startos/fileModels/store.json.ts`) on the `main` volume, holding
-`adminPassword`, `dbRootPassword` and `smtp`. The two credentials are written once at install;
-`smtp` is written by the Configure Email action and defaults to disabled. ERPNext itself never
-reads this file — it is the package's own record.
+One model, plus one file ERPNext owns that the package rewrites on every start.
+
+`store.json` (`startos/fileModels/store.json.ts`) on the `main` volume holds
+`adminPassword`, `dbRootPassword` and `smtp`. `dbRootPassword` is generated once at install
+and never rewritten. `adminPassword` is written only by the Set Administrator Password
+action — nothing else generates it, and it is absent until the user runs that action.
+`smtp` is written by the Configure Email action and defaults to disabled. ERPNext itself
+never reads this file; it is the package's own record.
 
 ERPNext's own configuration lives in `sites/common_site_config.json` inside the `sites`
-volume. The `configurator` oneshot rewrites the host, port and redis entries on **every**
-start, so hand edits to those keys do not survive a restart; other keys are left alone.
+volume, which has no file model. The `configurator` oneshot re-asserts the database host
+and port, the three redis URLs, the socket.io port and the chromium path on **every**
+start, so hand edits to those keys do not survive a restart. Every other key in that file —
+anything ERPNext or the user writes — is seeded once and then belongs to them.
 
 ## Dependencies
 
@@ -98,103 +124,117 @@ None.
 
 ## Network Access and Interfaces
 
-One interface: `ui`, an HTTP web interface on nginx's port. StartOS decides where it is
-reachable — LAN, `.local`, or Tor if the user installs and enables it.
+One interface: `ui`, an HTTP web interface served by nginx on port 8080. It serves the
+ERPNext desk, the login screen and the REST API under the same origin.
 
 nginx is configured with a fixed site name header, so the single site answers on every
 address StartOS offers it rather than on one hostname.
 
 ## Installation and First-Run Flow
 
-Install generates a MariaDB root password and an Administrator password, then runs a
-temporary daemon chain (`runUntilSuccess`): MariaDB and both redis instances come up, the
-configurator writes bench config, and `bench new-site` creates the site, installs the ERPNext
-app and sets the Administrator password. This takes several minutes and can take longer on
-slower hardware; the install progress bar reports it as a phase.
+Install runs a temporary daemon chain (`runUntilSuccess`): MariaDB and both redis instances
+come up, the configurator writes bench config, and `bench new-site` creates the site,
+installs the ERPNext app and sets a throwaway Administrator password that is never stored.
+This takes several minutes, longer on slower hardware; the install progress bar reports it
+as a phase. The generated MariaDB root password is stored in `store.json`.
 
-When it finishes, a **critical** task points at the View Administrator Credentials action.
-The service will not start until the user runs it — deliberately, so nobody ends up with a
-running accounting system whose admin password they have never seen.
+The Administrator password the user actually receives is minted afterwards, by the Set
+Administrator Password action, which a critical task sends them to. The service cannot
+start until they run it, so nobody ends up with a running accounting system whose admin
+password they have never seen.
 
-Sign in with username `Administrator` and that password, then work through ERPNext's own
-setup wizard (company, fiscal year, chart of accounts, currency).
+After signing in as `Administrator`, the user completes ERPNext's own setup wizard —
+company, fiscal year, chart of accounts, currency. The package does not skip or pre-fill
+it, and its answers are hard to change afterwards.
 
 ## Actions
 
-| Action                           | When to run                            | Effect                                                                 |
-| -------------------------------- | -------------------------------------- | ---------------------------------------------------------------------- |
-| View Administrator Credentials   | After install, or whenever forgotten   | Reads and displays the stored password. Changes nothing. Safe to repeat |
-| Reset Administrator Password     | Password lost or should be rotated     | Generates a new password, applies it with `bench set-admin-password`, stores and returns it |
-| Configure Email (SMTP)           | To send invoices and notifications     | Stores the choice of StartOS system SMTP, a custom relay, or disabled. Applied on next start |
+Two actions, both user-facing. There are no hidden actions.
 
-Reset runs only while the service is stopped: ERPNext keeps the password hashed in its
-database, so the action brings up its own MariaDB, applies the change, and tears it down.
-It rotates only the `Administrator` account — user accounts created inside ERPNext are
-managed in ERPNext.
+**Set Administrator Password.** Run it when the critical task asks at install, and again to
+rotate. It starts its own MariaDB against the `db` volume, applies the new password with
+`bench set-admin-password`, tears the database back down, stores the password and returns
+it. Takes roughly a minute, most of it waiting for MariaDB. Safe to repeat — each run
+replaces the previous password, and the previous one stops working immediately. It touches
+only the `Administrator` account; users created inside ERPNext are managed there. This is
+the only place an Administrator password is ever shown, so a password lost between runs is
+recovered by rotating, not by looking it up.
+
+**Configure Email (SMTP).** Run it to let ERPNext send invoices, quotes and notifications.
+It writes the choice to `store.json` and nothing else — the `smtp` oneshot applies it to
+ERPNext's Email Account on the next start, so the service must be restarted for a change to
+take effect. Safe to repeat. Whether the settings work is decided by ERPNext, not by
+StartOS: see [Limitations and Differences](#limitations-and-differences).
 
 ## Tasks
 
-One task, raised at the end of install: **critical**, pointing at View Administrator
-Credentials. Running that action clears it and lets the service start.
+One task, raised whenever no Administrator password is stored — which is the case from the
+end of install until the user acts, and again if the store is ever cleared.
+
+- **What raises it:** `store.json` has no `adminPassword`.
+- **Severity:** `critical`. ERPNext cannot start while it is outstanding, and the ordinary
+  Start/Stop controls are replaced by the task.
+- **What clears it:** running Set Administrator Password. It can return, but only if the
+  stored password is removed.
 
 ## Health Checks
 
-- **Web Interface** (user-visible): nginx is accepting connections. This is the only check
-  surfaced in the UI, and it is the one that means "ERPNext is usable".
-- Internal, not displayed: MariaDB via `healthcheck.sh --connect --innodb_initialized`,
-  each redis via `redis-cli ping`, the backend and websocket via a port probe.
-- The scheduler and both queue workers expose no port and no status endpoint, so they report
-  ready as soon as they are running; the supervisor restarts them if they exit.
+One check is displayed; the rest gate startup ordering without appearing in the UI.
 
-Startup is ordered by `requires`: chown → database and cache → configurator → backend and
-websocket → workers, scheduler and nginx. A failure early in that chain leaves the later
-daemons waiting rather than crash-looping.
+- **Web Interface** (displayed): nginx is accepting connections on 8080. Green here means
+  ERPNext is usable. A failure that persists past the grace period, with the backend
+  healthy, points at nginx or the built assets rather than at the application.
+- Not displayed: MariaDB via `healthcheck.sh --connect --innodb_initialized`, each redis via
+  `redis-cli ping`, and the backend and websocket via a port probe. On first start these
+  stay unready for a minute or two while MariaDB initializes; that is a slow start, not a
+  fault. A backend that never becomes ready after MariaDB is up is usually a site-config or
+  schema problem, and the `backend` subcontainer's log says which.
+- The scheduler and both queue workers expose no port and no status endpoint, so they report
+  ready as soon as they are running; the supervisor restarts them if they exit. Background
+  jobs silently not running is therefore not visible as a failed check — read the
+  `scheduler` and `queue-*` logs.
+
+Startup is ordered by `requires`: `seed-sites` → database and cache → configurator →
+backend and websocket → workers, scheduler and nginx. A failure early in that chain leaves
+the later daemons waiting rather than crash-looping.
 
 ## Backups and Restore
 
-All three volumes are copied as files. StartOS stops the service for the duration of a
-backup, so MariaDB has shut down cleanly and its data directory is at rest — this is not a
-live-directory copy. `sites` holds uploads, the site config and the site encryption key,
-without which the database is unreadable; `main` carries the stored credentials.
+The strategy is a wholesale file copy of all three volumes — `db`, `sites` and `main`.
+Nothing is dumped logically, so the MariaDB data directory itself is what is captured and
+restored. This is sound because StartOS stops the service for the duration of a backup, so
+MariaDB has shut down cleanly and its files are at rest.
 
-A logical dump via `sdk.Backups.withMysqlDump` would be the idiomatic choice, but it invokes
-`mysqld`, `mysqladmin`, `mysqldump`, `mysql` and `mysql_install_db`, and MariaDB 11.8 ships
-none of those names — only the `mariadb*` equivalents. Backups fail with "MySQL/MariaDB
-failed to become ready" until that is fixed upstream (start-technologies#3763).
+Nothing is excluded. `sites` must be in the set alongside `db`, because it holds the site
+encryption key without which the restored database cannot be read; `main` carries the
+stored credentials, so a restored instance keeps the Administrator password that was in
+force when the backup was taken.
 
-Verified end to end on StartOS 0.4.0: backup, uninstall, restore, then sign in with the
-pre-backup password and find the same records.
-
-## What Is Unchanged from Upstream
-
-Everything about ERPNext itself: the accounting model, the setup wizard, the REST API at
-`/api/resource/<DocType>`, the app installer, print formats, workflows, and the desk UI.
-The process split and the images are upstream's. This package supplies the database,
-the cache, the site bootstrap, credential handling, backups and the network interface.
+A restored instance needs nothing rebuilt and no credential re-entered. It comes back with
+the same site, the same data and the same password.
 
 ## Limitations and Differences
 
-- **Single site.** Frappe supports many sites per bench; this package creates and serves
-  exactly one, with a fixed database name so backups know what to dump.
-- **Email settings apply on the next start.** The Configure Email action stores the choice;
-  the `smtp` oneshot writes it into ERPNext when the service starts.
-- **Email settings are validated by ERPNext, not by StartOS.** ERPNext opens a real SMTP
-  session when it saves an outgoing account, so a wrong password or an unreachable relay is
-  only discovered at start. It is reported in the service log as a `[smtp]` line and mail is
-  left unconfigured — it never blocks startup.
-- **A mail account you create yourself wins.** If you set your own default outgoing Email
-  Account inside ERPNext, ERPNext uses it in preference to the one this package manages.
-- **Password reset is offline.** See Actions above.
-- **`bench` is not exposed as an action.** Administrative `bench` commands can be run with
-  `start-cli package attach erpnext -n backend -- bench --site <site> <command>`.
-- **Upstream app upgrades.** A package release that carries a newer ERPNext image runs
-  `bench migrate` as part of the update; a failed migration rolls the update back.
+What this package does differently from a stock `frappe_docker` deployment, and where a
+StartOS control replaces an ERPNext one.
 
-## Contributing
-
-Build and development workflow follow the StartOS packaging guide:
-<https://docs.start9.com/packaging>. Keep `README.md`, `instructions.md`, and `AGENTS.md`
-in sync with any change to user-visible behavior or package structure.
+1. **Single site.** Frappe supports many sites per bench; this package creates and serves
+   exactly one, under a fixed site name and a fixed database name.
+2. **Email settings apply on the next start.** The Configure Email action stores the choice;
+   the `smtp` oneshot writes it into ERPNext when the service starts.
+3. **Email settings are validated by ERPNext, not by StartOS.** ERPNext opens a real SMTP
+   session when it saves an outgoing account, so a wrong password or an unreachable relay is
+   only discovered at start. It is reported in the service log as a `[smtp]` line and mail is
+   left unconfigured — it never blocks startup.
+4. **A mail account you create yourself wins.** If you set your own default outgoing Email
+   Account inside ERPNext, ERPNext uses it in preference to the one this package manages.
+5. **Setting the Administrator password requires the service to be stopped**, because the
+   action runs its own database to apply it.
+6. **`bench` is not exposed as an action.** Administrative `bench` commands can be run with
+   `start-cli package attach erpnext -n backend -- bench --site <site> <command>`.
+7. **Upstream app upgrades run a schema migration.** A package release carrying a newer
+   ERPNext image runs `bench migrate` during the update; a failed migration rolls the update
+   back.
 
 ---
 
@@ -202,7 +242,7 @@ in sync with any change to user-visible behavior or package structure.
 
 ```yaml
 package_id: 'erpnext'
-image: 'frappe/erpnext'
+images: ['frappe/erpnext', 'mariadb', 'redis']
 architectures: ['x86_64', 'aarch64']
 subcontainers:
   [
@@ -241,11 +281,14 @@ startos_managed_env_vars:
     'UPSTREAM_REAL_IP_RECURSIVE',
     'PROXY_READ_TIMEOUT',
     'CLIENT_MAX_BODY_SIZE',
+    'SMTP_FIELDS',
+    'DB_ROOT_PASSWORD',
+    'ADMIN_PASSWORD',
+    'NEW_ADMIN_PASSWORD',
   ]
 dependencies: []
-interfaces: { ui: 'http web interface' }
-actions: ['get-admin-credentials', 'reset-admin-password', 'manage-smtp']
-tasks: ['critical: view administrator credentials after install']
-health_checks:
-  ['Web Interface', 'mariadb', 'redis-cache', 'redis-queue', 'backend', 'websocket']
+interfaces: { ui: { type: ui, port: 8080 } }
+actions: ['set-admin-password', 'manage-smtp']
+tasks: [{ action: set-admin-password, severity: critical }]
+health_checks: ['frontend'] # the only one StartOS surfaces; the rest gate ordering only
 ```

@@ -24,8 +24,7 @@ import {
   uiPort,
 } from './utils'
 
-// The workers and the scheduler expose no port and no status endpoint, so there
-// is nothing to probe: the daemon supervisor restarts them if they exit.
+// The workers and scheduler expose no port and no status endpoint to probe.
 const alwaysReady = async () => ({ result: 'success' as const, message: null })
 
 export const main = sdk.setupMain(async ({ effects }) => {
@@ -55,8 +54,6 @@ export const main = sdk.setupMain(async ({ effects }) => {
 
   return (
     sdk.Daemons.of(effects)
-      // Seeds the sites volume from the image on first start and hands it to
-      // uid 1000; StartOS creates volume subpaths root-owned and empty.
       .addOneshot('seed-sites', {
         subcontainer: seedSub,
         exec: {
@@ -105,8 +102,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
         exec: { command: bench(configuratorScript) },
         requires: ['seed-sites', 'mariadb', 'redis-cache', 'redis-queue'],
       })
-      // Nothing requires this, so a relay that is down or misconfigured cannot
-      // hold up the service — the oneshot reports the problem and exits clean.
+      // Nothing requires this, so a bad relay cannot hold up the service.
       .addOneshot('smtp', {
         subcontainer: smtpSub,
         exec: {

@@ -37,30 +37,24 @@ Things that will bite you:
 
 - **All subcontainers share one network namespace**, so they talk over `127.0.0.1` and no
   two may bind the same port. The two redis instances differ only by port for that reason.
-- **The `sites` volume is shared by every frappe container** and is created root-owned,
-  while the image runs as uid 1000. The `chown` oneshot has to run before anything else,
-  in `main.ts` and in both init chains.
+- **The `sites` volume is shared by every frappe container** and is created empty and
+  root-owned, while the image runs as uid 1000. The `seed-sites` oneshot copies the image's
+  `sites/` skeleton in and hands it over, and has to run before anything else — in `main.ts`
+  and in both init chains.
 - **The site is created once, at install**, by a `runUntilSuccess` chain — MariaDB has to be
   running for `bench new-site`, which is why this is not a plain `setupOnInit` step. The
   database name is pinned rather than left to bench, which would otherwise generate a random
-  one per site — a fixed name keeps the schema identifiable to anything that has to name it.
+  one per site.
+- **`bench new-site` gets a throwaway Administrator password that is never stored.** The one
+  the user gets is minted by the `set-admin-password` action, which a critical task sends
+  them to before the service may start. Do not add an action that only displays a stored
+  credential — one action generates, stores, applies and returns it, and the same one
+  rotates it.
 - **Backups copy volumes; they do not dump.** `Backups.withMysqlDump` cannot drive a MariaDB
   11.x image (it calls `mysqld`/`mysqladmin`/`mysqldump`, which no longer exist — see
-  start-technologies#3763). Copying is sound only because StartOS stops the service for a
+  start-technologies#3766). Copying is sound only because StartOS stops the service for a
   backup; if that ever stops being true, this has to become a logical dump.
 - **Bumping the image means a schema migration.** `bench migrate` runs on `kind === 'update'`
   inside init, where a failure rolls the update back. Do not move it to a oneshot in `main`.
 - **Credentials never go on a command line** — `bench` reads them from the environment so
   they stay out of the process table and the service log.
-
-<!--
-TODO: write the bullets for this package, then delete this comment.
-
-Only what someone *changing* this package needs and cannot get from README.md or
-instructions.md. What belongs here, and what does not, is set out under
-"AGENTS.md and CLAUDE.md":
-
-  ../start-technologies/projects/start-sdk/docs/src/project-structure.md
-
-A simple package needs none of this — delete the section rather than padding it.
--->

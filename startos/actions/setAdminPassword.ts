@@ -4,6 +4,7 @@ import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 import {
   bench,
+  getErpnextSub,
   getMariadbEnv,
   getMariadbSub,
   mariadbFlags,
@@ -11,20 +12,17 @@ import {
   siteName,
 } from '../utils'
 
-const RESET_TIMEOUT = 300_000
+const SET_PASSWORD_TIMEOUT = 300_000
 
-export const resetAdminPassword = sdk.Action.withoutInput(
-  'reset-admin-password',
+export const setAdminPassword = sdk.Action.withoutInput(
+  'set-admin-password',
 
   async () => ({
-    name: i18n('Reset Administrator Password'),
+    name: i18n('Set Administrator Password'),
     description: i18n(
-      'Generate a new random password for the ERPNext Administrator account and apply it.',
+      '<p>Generate a new random password for the ERPNext Administrator account and apply it.</p><p>This action can only run while ERPNext is stopped, because it starts its own copy of the database to apply the change.</p>',
     ),
     warning: null,
-    // ERPNext keeps the password hashed in its database, so applying a new one
-    // means running bench against MariaDB. This action brings up its own
-    // database rather than sharing the running service's.
     allowedStatuses: 'only-stopped',
     group: null,
     visibility: 'enabled',
@@ -34,7 +32,7 @@ export const resetAdminPassword = sdk.Action.withoutInput(
     const store = await storeJson.read().const(effects)
     if (!store?.dbRootPassword) {
       throw new Error(
-        'ERPNext is not initialized yet, so there is no account to reset.',
+        'ERPNext is not initialized yet, so there is no account to set a password on.',
       )
     }
 
@@ -43,18 +41,7 @@ export const resetAdminPassword = sdk.Action.withoutInput(
       len: 24,
     })
 
-    const mariadbSub = getMariadbSub(effects, 'mariadb-reset')
-    const benchSub = sdk.SubContainer.of(
-      effects,
-      { imageId: 'erpnext' },
-      sdk.Mounts.of().mountVolume({
-        volumeId: 'sites',
-        subpath: null,
-        mountpoint: '/home/frappe/frappe-bench/sites',
-        readonly: false,
-      }),
-      'bench-reset',
-    )
+    const mariadbSub = getMariadbSub(effects, 'mariadb-set-password')
 
     await sdk.Daemons.of(effects)
       .addDaemon('mariadb', {
@@ -71,7 +58,7 @@ export const resetAdminPassword = sdk.Action.withoutInput(
         requires: [],
       })
       .addOneshot('set-password', {
-        subcontainer: benchSub,
+        subcontainer: getErpnextSub(effects, 'bench-set-password'),
         exec: {
           command: bench(
             `bench --site ${siteName} set-admin-password "$NEW_ADMIN_PASSWORD"`,
@@ -80,7 +67,7 @@ export const resetAdminPassword = sdk.Action.withoutInput(
         },
         requires: ['mariadb'],
       })
-      .runUntilSuccess(RESET_TIMEOUT)
+      .runUntilSuccess(SET_PASSWORD_TIMEOUT)
 
     await storeJson.merge(effects, { adminPassword })
 

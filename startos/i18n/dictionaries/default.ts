@@ -6,29 +6,27 @@ const dict = {
   'Web Interface': 1,
   'The web interface is ready': 2,
   'The web interface is not ready': 3,
-  // interfaces.ts
-  'Web UI': 4,
-  'The ERPNext web interface': 5,
-  // init/bootstrapErpnext.ts
-  'Installing ERPNext': 6,
-  'View the Administrator password generated for you, so you can sign in to ERPNext': 7,
-  // actions/getAdminCredentials.ts
-  'View Administrator Credentials': 8,
-  'Show the password for the ERPNext Administrator account, generated when this service was installed.': 9,
-  'ERPNext Administrator Credentials': 10,
-  'Use these credentials to sign in to ERPNext.': 11,
-  Username: 12,
-  Password: 13,
-  // actions/resetAdminPassword.ts
-  'Reset Administrator Password': 14,
-  'Generate a new random password for the ERPNext Administrator account and apply it.': 15,
   // internal daemon readiness (display: null — never rendered, but the API requires text)
-  Ready: 16,
-  'Not ready': 17,
-  'Updating ERPNext': 18,
+  Ready: 4,
+  'Not ready': 5,
+  // interfaces.ts
+  'Web UI': 6,
+  'The ERPNext web interface': 7,
+  // init/bootstrapErpnext.ts
+  'Installing ERPNext': 8,
+  'Updating ERPNext': 9,
+  // init/watchCredentials.ts
+  'Set the Administrator password before signing in to ERPNext': 10,
+  // actions/setAdminPassword.ts
+  'Set Administrator Password': 11,
+  '<p>Generate a new random password for the ERPNext Administrator account and apply it.</p><p>This action can only run while ERPNext is stopped, because it starts its own copy of the database to apply the change.</p>': 12,
+  'ERPNext Administrator Credentials': 13,
+  'Use these credentials to sign in to ERPNext.': 14,
+  Username: 15,
+  Password: 16,
   // actions/manageSmtp.ts
-  'Configure Email (SMTP)': 19,
-  'Choose how ERPNext sends email — invoices, notifications and password resets. Use the StartOS system SMTP server, your own provider, or turn email off.': 20,
+  'Configure Email (SMTP)': 17,
+  'Choose how ERPNext sends email — invoices, notifications and password resets. Use the StartOS system SMTP server, your own provider, or turn email off.': 18,
 } as const
 
 /**
