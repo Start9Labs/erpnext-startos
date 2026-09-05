@@ -2,8 +2,8 @@
 
 ## Documentation
 
-- <https://docs.frappe.io/*> — the upstream user guide for ERPNext and the Frappe framework it
-  is built on, including the accounting modules and the REST API reference.
+- [ERPNext user manual](https://docs.frappe.io/erpnext/*) — the upstream guide to every module, accounting included.
+- [Frappe framework documentation](https://docs.frappe.io/framework/*) — the framework ERPNext is built on, including the REST API reference.
 
 ## What you get on StartOS
 
@@ -18,7 +18,7 @@ app before it will start. The progress bar tells you where it is.
 
 1. Run the **Set Administrator Password** action and copy the password it shows you. This is
    the only time it is displayed, and ERPNext will not start until you have run it.
-2. Start ERPNext and open the web interface.
+2. Start ERPNext and open its **Web UI** interface.
 3. Sign in with the username `Administrator` and that password.
 4. Complete ERPNext's setup wizard — your company name, country, currency, fiscal year and
    chart of accounts.
@@ -60,11 +60,11 @@ It affects only the `Administrator` account; other users are managed inside ERPN
 **Configure Email (SMTP)** decides how ERPNext sends invoices, quotes and notifications:
 
 - **Disabled** — ERPNext sends no email at all. This is the default.
-- **System** — use the SMTP server configured once for your whole server in StartOS.
-  Available only if you have set one up there.
-- **Custom** — your own provider. Pick your provider (or "Other"), then give the host, the
-  port and whether it uses TLS or STARTTLS, the address mail should come from, and your
-  username and password.
+- **System Credentials** — use the SMTP server configured once for your whole server in
+  StartOS. Available only if you have set one up there.
+- **Custom Credentials** — your own provider. Pick your provider (or "Other"), then give the
+  host, the port and whether it uses TLS or STARTTLS, the address mail should come from, and
+  your username and password.
 
 The setting is applied the next time ERPNext starts, so restart it afterwards.
 
