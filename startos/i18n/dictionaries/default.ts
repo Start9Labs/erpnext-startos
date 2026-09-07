@@ -13,8 +13,10 @@ const dict = {
   'Web UI': 6,
   'The ERPNext web interface': 7,
   // init/bootstrapErpnext.ts
-  'Installing ERPNext': 8,
-  'Updating ERPNext': 9,
+  'Starting the database': 8,
+  'Installing the Frappe framework': 9,
+  'Installing the ERPNext app': 19,
+  'Migrating the database': 20,
   // init/watchCredentials.ts
   'Set the Administrator password before signing in to ERPNext': 10,
   // actions/setAdminPassword.ts
