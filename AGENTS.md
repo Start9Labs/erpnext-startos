@@ -58,3 +58,7 @@ Things that will bite you:
   inside init, where a failure rolls the update back. Do not move it to a oneshot in `main`.
 - **Credentials never go on a command line** — `bench` reads them from the environment so
   they stay out of the process table and the service log.
+- **Install progress phases are driven by `bench`'s own stdout** — `Installing frappe...`,
+  `Installing erpnext...`, and its `Updating DocTypes … NN%` bars. Re-check those strings
+  when bumping the image: a reword leaves a bar indeterminate instead of failing anything,
+  so nothing else will tell you.

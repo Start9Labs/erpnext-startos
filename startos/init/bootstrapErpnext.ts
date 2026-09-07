@@ -26,7 +26,7 @@ const INSTALL_TIMEOUT = 1_800_000
 export const bootstrapErpnext = sdk.setupOnInit(
   async (effects, kind, progress) => {
     if (kind === 'update') {
-      const migrating = progress.addPhase(i18n('Updating ERPNext'))
+      const migrating = progress.addPhase(i18n('Migrating the database'))
       migrating.start()
       await runSiteMigrate(effects)
       migrating.complete()
@@ -34,14 +34,24 @@ export const bootstrapErpnext = sdk.setupOnInit(
     }
     if (kind !== 'install') return
 
-    const installing = progress.addPhase(i18n('Installing ERPNext'))
-    installing.start()
-    await createSite(effects)
-    installing.complete()
+    await createSite(effects, progress)
   },
 )
 
-async function createSite(effects: T.Effects): Promise<void> {
+// Contributions are a measured install: ~50s database, ~65s framework, ~140s app.
+async function createSite(
+  effects: T.Effects,
+  progress: utils.FullProgressTracker,
+): Promise<void> {
+  const starting = progress.addPhase(i18n('Starting the database'), 4)
+  const framework = progress.addPhase(
+    i18n('Installing the Frappe framework'),
+    5,
+  )
+  const app = progress.addPhase(i18n('Installing the ERPNext app'), 11)
+
+  starting.start()
+
   const throwawayAdminPassword = utils.getDefaultString({
     charset: 'a-z,A-Z,0-9',
     len: 24,
@@ -112,12 +122,59 @@ async function createSite(effects: T.Effects): Promise<void> {
           DB_ROOT_PASSWORD: dbRootPassword,
           ADMIN_PASSWORD: throwawayAdminPassword,
         },
+        ...siteProgress(starting, framework, app),
       },
       requires: ['configurator'],
     })
     .runUntilSuccess(INSTALL_TIMEOUT)
 
+  starting.complete()
+  framework.complete()
+  app.complete()
+
   await storeJson.merge(effects, { dbRootPassword })
+}
+
+// bench's narration on stdout is the only progress the site build emits.
+function siteProgress(
+  starting: utils.PhaseHandle,
+  framework: utils.PhaseHandle,
+  app: utils.PhaseHandle,
+) {
+  const doctypes =
+    /Updating DocTypes for (frappe|erpnext)[^[]*\[[^\]]*\]\s*(\d+)%/g
+  let stage: 'starting' | 'framework' | 'app' = 'starting'
+  let tail = ''
+
+  return {
+    onStdout: (chunk: Buffer | string) => {
+      process.stdout.write(chunk)
+
+      // A marker can straddle two chunks, so match on the carry-over too.
+      const text = tail + chunk
+      tail = text.slice(-4096)
+
+      if (stage === 'starting' && text.includes('Installing frappe...')) {
+        stage = 'framework'
+        starting.complete()
+        framework.start()
+      }
+      if (stage === 'framework' && text.includes('Installing erpnext...')) {
+        stage = 'app'
+        framework.complete()
+        app.start()
+      }
+
+      const latest = [...text.matchAll(doctypes)].pop()
+      if (latest) {
+        const phase = latest[1] === 'frappe' ? framework : app
+        phase.setTotal(100)
+        phase.setDone(Number(latest[2]))
+      }
+    },
+    // Either callback pipes all three streams, so stderr has to be drained too.
+    onStderr: (chunk: Buffer | string) => process.stderr.write(chunk),
+  }
 }
 
 // Runs in init, where StartOS has snapshotted the volumes, so a failed migration rolls the update back.
