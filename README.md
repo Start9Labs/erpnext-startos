@@ -87,14 +87,18 @@ nginx 8080.
 
 ## Volume and Data Layout
 
-Three volumes, all included in backups. The ledger itself is MariaDB's data directory on
-`db`; everything a restore needs to read it is on `sites`.
+Four volumes. The ledger itself is MariaDB's data directory on `db`; everything a restore
+needs to read it is on `sites`.
 
 | Volume  | Mountpoint                        | Contents                                                      |
 | ------- | --------------------------------- | ------------------------------------------------------------- |
 | `sites` | `/home/frappe/frappe-bench/sites` | Site config, the encryption key, uploaded files, built assets |
 | `db`    | `/var/lib/mysql`                  | MariaDB data directory                                        |
+| `dump`  | `/dump`, `/docker-entrypoint-initdb.d` on restore | `erpnext.sql.zst`, the database dump a backup carries |
 | `main`  | package store                     | `store.json`                                                  |
+
+The backup set is `sites`, `main` and `dump`; `db` is not in it. See
+[Backups and Restore](#backups-and-restore).
 
 The `sites` volume is created root-owned and empty by StartOS while every frappe process
 runs as uid 1000, so the `seed-sites` oneshot fills it from the image and hands it over
@@ -103,7 +107,7 @@ is a no-op on every later start.
 
 ## File Models
 
-One model, plus one file ERPNext owns that the package rewrites on every start.
+Two models, plus one file ERPNext owns that the package rewrites on every start.
 
 `store.json` (`startos/fileModels/store.json.ts`) on the `main` volume holds
 `adminPassword`, `dbRootPassword` and `smtp`. `dbRootPassword` is generated once at install
@@ -111,6 +115,11 @@ and never rewritten. `adminPassword` is written only by the Set Administrator Pa
 action — nothing else generates it, and it is absent until the user runs that action.
 `smtp` is written by the Configure Email action and defaults to disabled. ERPNext itself
 never reads this file; it is the package's own record.
+
+`site_config.json` (`startos/fileModels/siteConfig.json.ts`) at
+`sites/erpnext.localhost/site_config.json` is bench's own file, read and never written. It
+names the database and the credentials frappe connects with, which is what lets a restore
+recreate that database user.
 
 ERPNext's own configuration lives in `sites/common_site_config.json` inside the `sites`
 volume, which has no file model. The `configurator` oneshot re-asserts the database host
@@ -200,15 +209,23 @@ the later daemons waiting rather than crash-looping.
 
 ## Backups and Restore
 
-The strategy is a wholesale file copy of all three volumes — `db`, `sites` and `main`.
-Nothing is dumped logically, so the MariaDB data directory itself is what is captured and
-restored. This is sound because StartOS stops the service for the duration of a backup, so
-MariaDB has shut down cleanly and its files are at rest.
+A backup carries a logical dump of the database, not MariaDB's files. The pre-backup hook
+starts MariaDB against the `db` volume, runs `mariadb-dump`, and writes
+`erpnext.sql.zst` to the `dump` volume; the file copy that follows takes `sites`, `main`
+and `dump`. The post-backup hook deletes the staged dump, so it does not sit on the data
+disk between backups.
 
-Nothing is excluded. `sites` must be in the set alongside `db`, because it holds the site
-encryption key without which the restored database cannot be read; `main` carries the
-stored credentials, so a restored instance keeps the Administrator password that was in
-force when the backup was taken.
+`sites` must be in the set alongside the dump, because it holds the site encryption key
+without which the restored database cannot be read, and the credentials frappe connects
+with; `main` carries the stored credentials, so a restored instance keeps the Administrator
+password that was in force when the backup was taken.
+
+Restore mounts the dump at `/docker-entrypoint-initdb.d` and runs the mariadb image's own
+entrypoint against an empty data directory, which is the path a first install takes: the
+entrypoint initializes the directory, creates the `root`, `healthcheck` and site users from
+the restored credentials, and imports the dump. The hook then counts the tables in the
+restored schema and fails the restore if there are none, so a dump that did not import can
+never be mistaken for an empty ledger.
 
 A restored instance needs nothing rebuilt and no credential re-entered. It comes back with
 the same site, the same data and the same password.
@@ -263,13 +280,20 @@ volumes:
   {
     sites: '/home/frappe/frappe-bench/sites',
     db: '/var/lib/mysql',
+    dump: 'backup staging',
     main: 'package store',
   }
-file_models: ['store.json']
+backup_set: ['sites', 'main', 'dump'] # db is dumped logically
+file_models: ['store.json', 'site_config.json']
 startos_managed_env_vars:
   [
     'MYSQL_ROOT_PASSWORD',
+    'MYSQL_PWD',
     'MARIADB_AUTO_UPGRADE',
+    'MARIADB_DATABASE',
+    'MARIADB_USER',
+    'MARIADB_PASSWORD',
+    'MARIADB_USER_HOST',
     'GUNICORN_WORKERS',
     'GUNICORN_THREADS',
     'GUNICORN_TIMEOUT',

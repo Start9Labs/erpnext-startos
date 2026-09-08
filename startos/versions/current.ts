@@ -1,13 +1,14 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '16.32.3:1',
+  version: '16.32.3:2',
   releaseNotes: {
-    en_US: 'Initial release of ERPNext for StartOS',
-    es_ES: 'Lanzamiento inicial de ERPNext para StartOS',
-    de_DE: 'Erstveröffentlichung von ERPNext für StartOS',
-    pl_PL: 'Pierwsze wydanie ERPNext dla StartOS',
-    fr_FR: "Première version d'ERPNext pour StartOS",
+    en_US: 'Backups and restores are substantially faster.',
+    es_ES:
+      'Las copias de seguridad y las restauraciones son sustancialmente más rápidas.',
+    de_DE: 'Backups und Wiederherstellungen sind deutlich schneller.',
+    pl_PL: 'Tworzenie i przywracanie kopii zapasowych jest znacznie szybsze.',
+    fr_FR: 'Les sauvegardes et les restaurations sont nettement plus rapides.',
   },
   migrations: {
     up: async ({ effects }) => {},
