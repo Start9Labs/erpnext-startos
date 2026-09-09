@@ -10,7 +10,7 @@ export const manifest = setupManifest({
   marketingUrl: 'https://frappe.io/erpnext',
   donationUrl: null,
   description: { short, long },
-  volumes: ['main', 'sites', 'db', 'dump'],
+  volumes: ['main', 'sites', 'db'],
   images: {
     erpnext: {
       source: { dockerTag: 'frappe/erpnext:v16.32.3' },

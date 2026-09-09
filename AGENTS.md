@@ -50,15 +50,10 @@ Things that will bite you:
   them to before the service may start. Do not add an action that only displays a stored
   credential — one action generates, stores, applies and returns it, and the same one
   rotates it.
-- **`db` is not in the backup set — a `mariadb-dump` of it is.** Don't add it back: the data
-  directory is thousands of files and several times the size of its own dump. And don't
-  reach for `sdk.Backups.withMysqlDump` instead — it cannot drive a MariaDB 11.x image,
-  because it calls `mysqld`/`mysqladmin`/`mysqldump`, which no longer exist
-  (start-technologies#3766).
-- **Restore hands the dump to the image's own entrypoint** through
-  `/docker-entrypoint-initdb.d`. Don't initialize the data directory by hand: the entrypoint
-  is what creates the `healthcheck` users, and `mariadbReady` authenticates as one of them,
-  so a hand-built datadir never passes the ready check.
+- **Backups copy volumes; they do not dump.** `Backups.withMysqlDump` cannot drive a MariaDB
+  11.x image (it calls `mysqld`/`mysqladmin`/`mysqldump`, which no longer exist — see
+  start-technologies#3766). Copying is sound only because StartOS stops the service for a
+  backup; if that ever stops being true, this has to become a logical dump.
 - **Bumping the image means a schema migration.** `bench migrate` runs on `kind === 'update'`
   inside init, where a failure rolls the update back. Do not move it to a oneshot in `main`.
 - **Credentials never go on a command line** — `bench` reads them from the environment so

@@ -108,7 +108,6 @@ export const configuratorScript = [
 ].join(' && ')
 
 type Sub = Awaited<ReturnType<typeof sdk.SubContainer.of>>
-export type EagerSub = Awaited<ReturnType<typeof sdk.SubContainer.eager>>
 
 export const redisReady = (sub: Sub, port: number) => async () => {
   const res = await sub.exec(['redis-cli', '-p', String(port), 'ping'])
@@ -130,9 +129,6 @@ export const mariadbReady = (sub: Sub) => async () => {
 
 // Pinned; bench would otherwise generate a random database name per site.
 export const dbName = 'erpnext'
-
-// The mariadb entrypoint imports a *.sql.zst it finds in /docker-entrypoint-initdb.d.
-export const dumpName = `${dbName}.sql.zst`
 
 // The Email Account row this package owns; anything the user creates is left alone.
 export const smtpAccountName = 'StartOS'
