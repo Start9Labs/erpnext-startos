@@ -21,7 +21,7 @@ const dict = {
   'Set the Administrator password before signing in to ERPNext': 10,
   // actions/setAdminPassword.ts
   'Set Administrator Password': 11,
-  '<p>Generate a new random password for the ERPNext Administrator account and apply it.</p><p>This action can only run while ERPNext is stopped, because it starts its own copy of the database to apply the change.</p>': 12,
+  'Generate a new random password for the Administrator account and apply it. Use this to set the first password, or if you are locked out of ERPNext.': 12,
   'ERPNext Administrator Credentials': 13,
   'Use these credentials to sign in to ERPNext.': 14,
   Username: 15,

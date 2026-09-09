@@ -20,7 +20,7 @@ export const setAdminPassword = sdk.Action.withoutInput(
   async () => ({
     name: i18n('Set Administrator Password'),
     description: i18n(
-      '<p>Generate a new random password for the ERPNext Administrator account and apply it.</p><p>This action can only run while ERPNext is stopped, because it starts its own copy of the database to apply the change.</p>',
+      'Generate a new random password for the Administrator account and apply it. Use this to set the first password, or if you are locked out of ERPNext.',
     ),
     warning: null,
     allowedStatuses: 'only-stopped',
