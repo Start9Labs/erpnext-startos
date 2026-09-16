@@ -13,7 +13,7 @@ export const manifest = setupManifest({
   volumes: ['main', 'sites', 'db'],
   images: {
     erpnext: {
-      source: { dockerTag: 'frappe/erpnext:v16.32.3' },
+      source: { dockerTag: 'frappe/erpnext:v16.34.2' },
       arch: ['x86_64', 'aarch64'],
     },
     mariadb: {
