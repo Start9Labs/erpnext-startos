@@ -1,93 +1,93 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '16.34.2:0',
+  version: '16.35.0:0',
   releaseNotes: {
-    en_US: `Updated ERPNext to 16.34.2.
+    en_US: `Updated ERPNext to 16.35.0.
 
 **Features**
 
-- Added entity filters to Purchase Analytics and Sales Analytics.
-- Added transaction currencies and price lists to Blanket Orders, configurable valuation for secondary items, custom tax calculations based on alternative values, and four Belgian charts of accounts.
+- The Warehouse Wise Item Balance Age and Value report now supports selecting multiple items and warehouses.
 
 **Fixes**
 
-- Strengthened access controls across accounting, banking, POS, project, and stock workflows.
-- Corrected manufacturing quantities, bank reconciliation, returns, reports, and numerous accounting and stock calculations.
+- Corrected inventory valuation, additional-cost allocation, stock closings, returns, billing calculations, and historical stock-entry costs.
+- Corrected dunning balances, transaction price lists, document rates, manufacturing workflows, and project details on subcontracting documents.
+- Added permission checks for customer emails, payment-ledger reposting, and invoice discounting.
 
 **Compatibility**
 
-- Financial Report Templates now reject invalid configurations, and the unused \`get_last_interaction\` CRM endpoint was removed.
+- IRS 1099 form printing now uses an external filing workflow; the report’s built-in printing option was retired.
 
-Full upstream release notes: [16.33.0](https://github.com/frappe/erpnext/releases/tag/v16.33.0), [16.34.0](https://github.com/frappe/erpnext/releases/tag/v16.34.0), [16.34.1](https://github.com/frappe/erpnext/releases/tag/v16.34.1), [16.34.2](https://github.com/frappe/erpnext/releases/tag/v16.34.2)`,
-    es_ES: `ERPNext se actualizó a la versión 16.34.2.
+[Full upstream release notes](https://github.com/frappe/erpnext/releases/tag/v16.35.0)`,
+    es_ES: `ERPNext se actualizó a la versión 16.35.0.
 
 **Funciones**
 
-- Se añadieron filtros de entidad a los informes de análisis de compras y ventas.
-- Se añadieron monedas de transacción y listas de precios a los pedidos abiertos, valoración configurable para artículos secundarios, cálculos de impuestos basados en valores alternativos y cuatro planes contables belgas.
+- El informe Antigüedad y valor del saldo de artículos por almacén ahora permite seleccionar varios artículos y almacenes.
 
 **Correcciones**
 
-- Se reforzaron los controles de acceso en los procesos de contabilidad, banca, punto de venta, proyectos y existencias.
-- Se corrigieron cantidades de fabricación, conciliaciones bancarias, devoluciones, informes y numerosos cálculos contables y de existencias.
+- Se corrigieron la valoración del inventario, la distribución de costes adicionales, los cierres de existencias, las devoluciones, los cálculos de facturación y los costes históricos de los movimientos de existencias.
+- Se corrigieron los saldos de reclamaciones de pago, las listas de precios de las transacciones, las tarifas de documentos, los procesos de fabricación y los datos de proyectos en documentos de subcontratación.
+- Se añadieron controles de permisos para los correos electrónicos de clientes, la contabilización de nuevo del libro mayor de pagos y el descuento de facturas.
 
 **Compatibilidad**
 
-- Las plantillas de informes financieros ahora rechazan configuraciones no válidas y se eliminó el punto final de CRM \`get_last_interaction\`, que no se utilizaba.
+- La impresión de formularios IRS 1099 requiere ahora un proceso de presentación externo; se retiró la opción de impresión integrada del informe.
 
-Notas completas de las versiones originales: [16.33.0](https://github.com/frappe/erpnext/releases/tag/v16.33.0), [16.34.0](https://github.com/frappe/erpnext/releases/tag/v16.34.0), [16.34.1](https://github.com/frappe/erpnext/releases/tag/v16.34.1), [16.34.2](https://github.com/frappe/erpnext/releases/tag/v16.34.2)`,
-    de_DE: `ERPNext wurde auf Version 16.34.2 aktualisiert.
+[Notas completas de la versión original](https://github.com/frappe/erpnext/releases/tag/v16.35.0)`,
+    de_DE: `ERPNext wurde auf Version 16.35.0 aktualisiert.
 
 **Funktionen**
 
-- Die Einkaufs- und Verkaufsanalysen erhielten Entitätsfilter.
-- Rahmenaufträge erhielten Transaktionswährungen und Preislisten. Außerdem wurden eine konfigurierbare Bewertung von Nebenartikeln, Steuerberechnungen anhand alternativer Werte und vier belgische Kontenpläne hinzugefügt.
+- Im Bericht zu Alter und Wert des artikelbezogenen Lagerbestands können nun mehrere Artikel und Lager ausgewählt werden.
 
 **Fehlerbehebungen**
 
-- Die Zugriffskontrollen in Buchhaltungs-, Bank-, Kassen-, Projekt- und Lagerabläufen wurden verbessert.
-- Fertigungsmengen, Bankabstimmungen, Retouren, Berichte sowie zahlreiche Buchhaltungs- und Lagerberechnungen wurden korrigiert.
+- Bestandsbewertung, Verteilung zusätzlicher Kosten, Lagerabschlüsse, Retouren, Abrechnungsberechnungen und historische Kosten von Lagerbuchungen wurden korrigiert.
+- Mahnsalden, Preislisten für Transaktionen, Dokumentpreise, Fertigungsabläufe und Projektdaten in Untervergabedokumenten wurden korrigiert.
+- Berechtigungsprüfungen für Kunden-E-Mails, die erneute Buchung des Zahlungsbuchs und die Rechnungsdiskontierung wurden hinzugefügt.
 
 **Kompatibilität**
 
-- Finanzberichtsvorlagen lehnen nun ungültige Konfigurationen ab. Der ungenutzte CRM-Endpunkt \`get_last_interaction\` wurde entfernt.
+- IRS-1099-Formulare werden nun über einen externen Einreichungsablauf gedruckt; die integrierte Druckoption des Berichts wurde eingestellt.
 
-Vollständige Upstream-Versionshinweise: [16.33.0](https://github.com/frappe/erpnext/releases/tag/v16.33.0), [16.34.0](https://github.com/frappe/erpnext/releases/tag/v16.34.0), [16.34.1](https://github.com/frappe/erpnext/releases/tag/v16.34.1), [16.34.2](https://github.com/frappe/erpnext/releases/tag/v16.34.2)`,
-    pl_PL: `Zaktualizowano ERPNext do wersji 16.34.2.
+[Vollständige Upstream-Versionshinweise](https://github.com/frappe/erpnext/releases/tag/v16.35.0)`,
+    pl_PL: `Zaktualizowano ERPNext do wersji 16.35.0.
 
 **Funkcje**
 
-- Dodano filtry jednostek do analiz zakupów i sprzedaży.
-- Dodano waluty transakcji i cenniki do zamówień ramowych, konfigurowalną wycenę produktów ubocznych, obliczenia podatków na podstawie alternatywnych wartości oraz cztery belgijskie plany kont.
+- Raport wieku i wartości salda artykułów według magazynu pozwala teraz wybrać wiele artykułów i magazynów.
 
 **Poprawki**
 
-- Wzmocniono kontrolę dostępu w procesach księgowych, bankowych, kasowych, projektowych i magazynowych.
-- Poprawiono ilości produkcyjne, uzgadnianie operacji bankowych, zwroty, raporty oraz liczne obliczenia księgowe i magazynowe.
+- Poprawiono wycenę zapasów, przydzielanie kosztów dodatkowych, zamknięcia magazynowe, zwroty, obliczenia rozliczeń i historyczne koszty przesunięć magazynowych.
+- Poprawiono salda monitów, cenniki transakcji, stawki dokumentów, procesy produkcyjne i dane projektów w dokumentach podwykonawstwa.
+- Dodano kontrole uprawnień do wiadomości e-mail klientów, ponownego księgowania rejestru płatności i dyskontowania faktur.
 
 **Zgodność**
 
-- Szablony raportów finansowych odrzucają teraz nieprawidłowe konfiguracje, a nieużywany punkt końcowy CRM \`get_last_interaction\` został usunięty.
+- Drukowanie formularzy IRS 1099 wymaga teraz zewnętrznego procesu składania; wbudowana opcja drukowania raportu została wycofana.
 
-Pełne informacje o wydaniach projektu źródłowego: [16.33.0](https://github.com/frappe/erpnext/releases/tag/v16.33.0), [16.34.0](https://github.com/frappe/erpnext/releases/tag/v16.34.0), [16.34.1](https://github.com/frappe/erpnext/releases/tag/v16.34.1), [16.34.2](https://github.com/frappe/erpnext/releases/tag/v16.34.2)`,
-    fr_FR: `ERPNext a été mis à jour vers la version 16.34.2.
+[Pełne informacje o wydaniu projektu źródłowego](https://github.com/frappe/erpnext/releases/tag/v16.35.0)`,
+    fr_FR: `ERPNext a été mis à jour vers la version 16.35.0.
 
 **Fonctionnalités**
 
-- Des filtres d’entités ont été ajoutés aux analyses des achats et des ventes.
-- Les commandes permanentes prennent désormais en charge les devises de transaction et les listes de prix. Cette version ajoute aussi l’évaluation configurable des articles secondaires, le calcul des taxes à partir de valeurs alternatives et quatre plans comptables belges.
+- Le rapport sur l’ancienneté et la valeur du solde des articles par entrepôt permet désormais de sélectionner plusieurs articles et entrepôts.
 
 **Correctifs**
 
-- Les contrôles d’accès ont été renforcés dans les processus de comptabilité, de banque, de point de vente, de projets et de stock.
-- Les quantités de fabrication, les rapprochements bancaires, les retours, les rapports et de nombreux calculs comptables et de stock ont été corrigés.
+- La valorisation des stocks, la répartition des coûts supplémentaires, les clôtures de stock, les retours, les calculs de facturation et les coûts historiques des mouvements de stock ont été corrigés.
+- Les soldes des relances, les listes de prix des transactions, les tarifs des documents, les processus de fabrication et les données de projet dans les documents de sous-traitance ont été corrigés.
+- Des contrôles d’autorisation ont été ajoutés pour les e-mails aux clients, la republication du grand livre des paiements et l’escompte de factures.
 
 **Compatibilité**
 
-- Les modèles de rapports financiers refusent désormais les configurations non valides et le point de terminaison CRM inutilisé \`get_last_interaction\` a été supprimé.
+- L’impression des formulaires IRS 1099 passe désormais par un processus de dépôt externe ; l’option d’impression intégrée au rapport a été retirée.
 
-Notes de version amont complètes : [16.33.0](https://github.com/frappe/erpnext/releases/tag/v16.33.0), [16.34.0](https://github.com/frappe/erpnext/releases/tag/v16.34.0), [16.34.1](https://github.com/frappe/erpnext/releases/tag/v16.34.1), [16.34.2](https://github.com/frappe/erpnext/releases/tag/v16.34.2)`,
+[Notes de version amont complètes](https://github.com/frappe/erpnext/releases/tag/v16.35.0)`,
   },
   migrations: {
     up: async ({ effects }) => {},
