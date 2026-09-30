@@ -182,10 +182,11 @@ end of install until the user acts, and again if the store is ever cleared.
 One check is displayed; the rest gate startup ordering without appearing in the UI.
 
 - **Web Interface** (displayed): nginx is accepting connections on 8080. Green here means
-  ERPNext is usable. A failure that persists past the grace period, with the backend
-  healthy, points at nginx or the built assets rather than at the application.
+  nginx is listening; check login and asset loading to confirm application usability.
+  A failure that persists past the grace period, with the backend healthy, points at nginx.
 - Not displayed: MariaDB via `healthcheck.sh --connect --innodb_initialized`, each redis via
-  `redis-cli ping`, and the backend and websocket via a port probe. On first start these
+  `redis-cli --raw ping` with a successful exit and a `PONG` reply, and the backend and
+  websocket via a port probe. On first start these
   stay unready for a minute or two while MariaDB initializes; that is a slow start, not a
   fault. A backend that never becomes ready after MariaDB is up is usually a site-config or
   schema problem, and the `backend` subcontainer's log says which.
@@ -234,7 +235,9 @@ StartOS control replaces an ERPNext one.
    `start-cli package attach erpnext -n backend -- bench --site <site> <command>`.
 7. **Upstream app upgrades run a schema migration.** A package release carrying a newer
    ERPNext image runs `bench migrate` during the update; a failed migration rolls the update
-   back.
+   back. Upstream data patches run through that same migration; ERPNext-side regeneration
+   and reposting of affected historical stock records are described in the upgrade guidance
+   in `instructions.md`.
 
 ---
 

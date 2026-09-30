@@ -110,8 +110,8 @@ export const configuratorScript = [
 type Sub = Awaited<ReturnType<typeof sdk.SubContainer.of>>
 
 export const redisReady = (sub: Sub, port: number) => async () => {
-  const res = await sub.exec(['redis-cli', '-p', String(port), 'ping'])
-  return res.exitCode === 0
+  const res = await sub.exec(['redis-cli', '--raw', '-p', String(port), 'ping'])
+  return res.exitCode === 0 && res.stdout.toString().trim() === 'PONG'
     ? { result: 'success' as const, message: null }
     : { result: 'loading' as const, message: null }
 }
