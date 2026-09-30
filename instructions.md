@@ -89,6 +89,8 @@ a backup.
 before nginx does; give it a few minutes on first run. If it stays unhealthy, the service
 logs from the `mariadb` and `backend` containers say why.
 
+**Startup waits on the cache or job queue.** Check the `redis-cache` and `redis-queue` logs.
+
 **Background jobs are not running.** The scheduler and queue workers run separately from the
 web interface and have no health indicator of their own. Look for `scheduler`, `queue-short`
 and `queue-long` in the service logs.

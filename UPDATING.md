@@ -5,13 +5,15 @@
 Upstream is the `frappe/erpnext` Docker image, which bundles the Frappe framework and the
 ERPNext app. The pin lives in `startos/manifest/index.ts` under `images.erpnext.source.dockerTag`.
 
-Find the latest release:
+Read the stable tags on the current major line rather than GitHub's "Latest" release,
+which can point to a different supported major:
 
 ```bash
-gh release view -R frappe/erpnext --json tagName -q .tagName
+gh api 'repos/frappe/erpnext/tags?per_page=100' --jq '.[].name'
+gh release view <tag> -R frappe/erpnext --json tagName,isPrerelease,body
 ```
 
-and confirm an image was actually published for it, on both architectures:
+Then confirm an image was actually published for the chosen tag, on both architectures:
 
 ```bash
 curl -s "https://hub.docker.com/v2/repositories/frappe/erpnext/tags/<tag>" \

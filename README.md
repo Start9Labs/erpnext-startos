@@ -182,10 +182,11 @@ end of install until the user acts, and again if the store is ever cleared.
 One check is displayed; the rest gate startup ordering without appearing in the UI.
 
 - **Web Interface** (displayed): nginx is accepting connections on 8080. Green here means
-  ERPNext is usable. A failure that persists past the grace period, with the backend
-  healthy, points at nginx or the built assets rather than at the application.
+  nginx is listening; check login and asset loading to confirm application usability.
+  A failure that persists past the grace period, with the backend healthy, points at nginx.
 - Not displayed: MariaDB via `healthcheck.sh --connect --innodb_initialized`, each redis via
-  `redis-cli ping`, and the backend and websocket via a port probe. On first start these
+  `redis-cli --raw ping` with a successful exit and a `PONG` reply, and the backend and
+  websocket via a port probe. On first start these
   stay unready for a minute or two while MariaDB initializes; that is a slow start, not a
   fault. A backend that never becomes ready after MariaDB is up is usually a site-config or
   schema problem, and the `backend` subcontainer's log says which.
