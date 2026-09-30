@@ -75,17 +75,6 @@ service logs for a line beginning `[smtp]`, fix the settings, and restart.
 You can still create your own Email Account inside ERPNext instead. If you mark one as the
 default outgoing account, ERPNext uses yours rather than the one StartOS manages.
 
-### Upgrades
-
-The update applies ERPNext's database changes before the service starts again. Read the
-release notes for any follow-up work on existing records.
-
-If you use chained **Stock Closing Entry** records, check their balances and use
-**Regenerate Stock Closing Entry** on affected completed records. Existing batch- and
-serial-tracked **Subcontracting Receipt** returns need reposting to apply corrected
-valuations. These operations run in the background; their duration depends on your stock
-history. Wait for completion and check the affected stock reports before relying on them.
-
 ### Backups
 
 A backup of ERPNext contains the database, your uploaded files and the site's encryption
@@ -101,8 +90,6 @@ before nginx does; give it a few minutes on first run. If it stays unhealthy, th
 logs from the `mariadb` and `backend` containers say why.
 
 **Startup waits on the cache or job queue.** Check the `redis-cache` and `redis-queue` logs.
-Startup waits for each Redis instance to answer `PING` with `PONG`; an error reply keeps the
-application waiting even if Redis has accepted the connection.
 
 **Background jobs are not running.** The scheduler and queue workers run separately from the
 web interface and have no health indicator of their own. Look for `scheduler`, `queue-short`

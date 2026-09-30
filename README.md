@@ -235,9 +235,7 @@ StartOS control replaces an ERPNext one.
    `start-cli package attach erpnext -n backend -- bench --site <site> <command>`.
 7. **Upstream app upgrades run a schema migration.** A package release carrying a newer
    ERPNext image runs `bench migrate` during the update; a failed migration rolls the update
-   back. Upstream data patches run through that same migration; ERPNext-side regeneration
-   and reposting of affected historical stock records are described in the upgrade guidance
-   in `instructions.md`.
+   back.
 
 ---
 

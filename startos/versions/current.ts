@@ -9,7 +9,6 @@ export const current = VersionInfo.of({
 
 - Faster item searches and more accurate manufacturing stock reservations, transfers, and returns.
 - Foreign-currency subcontracting service costs are converted to company currency; existing orders and draft receipts are updated during the upgrade.
-- Startup waits for a successful Redis PONG reply before configuring the application.
 
 **After upgrading**
 
@@ -22,7 +21,6 @@ Check existing chained Stock Closing Entry balances and use "Regenerate Stock Cl
 
 - Búsquedas de artículos más rápidas y mayor precisión en las reservas, transferencias y devoluciones de existencias de fabricación.
 - Los costes de servicios de subcontratación en moneda extranjera se convierten a la moneda de la empresa; los pedidos existentes y las recepciones en borrador se actualizan durante la actualización.
-- El inicio espera una respuesta PONG correcta de Redis antes de configurar la aplicación.
 
 **Después de actualizar**
 
@@ -35,7 +33,6 @@ Compruebe los saldos de los registros encadenados de Stock Closing Entry existen
 
 - Schnellere Artikelsuche und genauere Lagerreservierungen, Umlagerungen und Rückgaben in der Fertigung.
 - Fremdwährungskosten für Fremdfertigungsleistungen werden in die Unternehmenswährung umgerechnet; bestehende Aufträge und Wareneingangsentwürfe werden beim Upgrade aktualisiert.
-- Der Start wartet auf eine erfolgreiche PONG-Antwort von Redis, bevor die Anwendung konfiguriert wird.
 
 **Nach dem Upgrade**
 
@@ -48,7 +45,6 @@ Prüfen Sie die Salden bestehender verketteter Stock Closing Entry-Datensätze u
 
 - Szybsze wyszukiwanie artykułów i dokładniejsze rezerwacje, przesunięcia oraz zwroty zapasów w produkcji.
 - Koszty usług podwykonawstwa w walucie obcej są przeliczane na walutę firmy; istniejące zamówienia i robocze dokumenty przyjęcia są aktualizowane podczas aktualizacji.
-- Uruchamianie czeka na poprawną odpowiedź PONG z Redis przed skonfigurowaniem aplikacji.
 
 **Po aktualizacji**
 
@@ -61,7 +57,6 @@ Sprawdź salda istniejących powiązanych wpisów Stock Closing Entry i użyj "R
 
 - Recherche d'articles plus rapide et réservations, transferts et retours de stocks de fabrication plus précis.
 - Les coûts des services de sous-traitance en devise étrangère sont convertis dans la devise de l'entreprise ; les commandes existantes et les réceptions en brouillon sont mises à jour pendant la mise à niveau.
-- Le démarrage attend une réponse PONG réussie de Redis avant de configurer l'application.
 
 **Après la mise à niveau**
 
