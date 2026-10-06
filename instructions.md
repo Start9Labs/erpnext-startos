@@ -52,8 +52,9 @@ way or imported as spreadsheets under **Data Import**.
 
 **Set Administrator Password** generates a new random password, applies it, and shows it to
 you. Run it again whenever you need a new one — it is the only way to recover a lost
-Administrator password, because nothing stores a copy you can look up. Later runs need
-ERPNext stopped, since the action starts its own copy of the database to apply the change.
+Administrator password, because nothing stores a copy you can look up. Later runs ask you to
+confirm first, because the old password stops working. They also need ERPNext stopped, since
+the action starts its own copy of the database to apply the change.
 It affects only the `Administrator` account; other users are managed inside ERPNext under
 **Users**.
 

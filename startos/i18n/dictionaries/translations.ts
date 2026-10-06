@@ -23,6 +23,7 @@ export default {
     16: 'Contraseña',
     17: 'Configurar correo (SMTP)',
     18: 'Elige cómo envía ERPNext los correos — facturas, notificaciones y restablecimientos de contraseña. Usa el servidor SMTP del sistema de StartOS, tu propio proveedor, o desactiva el correo.',
+    21: 'Reemplaza la contraseña del Administrator. La contraseña actual deja de funcionar de inmediato.',
   },
   de_DE: {
     0: 'Starte ERPNext!',
@@ -46,6 +47,7 @@ export default {
     16: 'Passwort',
     17: 'E-Mail einrichten (SMTP)',
     18: 'Lege fest, wie ERPNext E-Mails versendet — Rechnungen, Benachrichtigungen und Passwort-Zurücksetzungen. Nutze den System-SMTP-Server von StartOS, deinen eigenen Anbieter, oder schalte E-Mail ab.',
+    21: 'Ersetzt das Passwort des Administrator-Kontos. Das aktuelle Passwort funktioniert sofort nicht mehr.',
   },
   pl_PL: {
     0: 'Uruchamianie ERPNext!',
@@ -69,6 +71,7 @@ export default {
     16: 'Hasło',
     17: 'Konfiguracja poczty (SMTP)',
     18: 'Wybierz, jak ERPNext wysyła wiadomości — faktury, powiadomienia i resetowanie haseł. Użyj systemowego serwera SMTP StartOS, własnego dostawcy albo wyłącz pocztę.',
+    21: 'Zastępuje hasło konta Administrator. Obecne hasło natychmiast przestaje działać.',
   },
   fr_FR: {
     0: 'Démarrage de ERPNext !',
@@ -92,5 +95,6 @@ export default {
     16: 'Mot de passe',
     17: "Configurer l'e-mail (SMTP)",
     18: "Choisissez comment ERPNext envoie les e-mails — factures, notifications et réinitialisations de mot de passe. Utilisez le serveur SMTP système de StartOS, votre propre fournisseur, ou désactivez l'e-mail.",
+    21: 'Remplace le mot de passe du compte Administrator. Le mot de passe actuel cesse immédiatement de fonctionner.',
   },
 } satisfies Record<string, LangDict>

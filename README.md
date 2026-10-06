@@ -155,7 +155,8 @@ Two actions, both user-facing. There are no hidden actions.
 rotate. It starts its own MariaDB against the `db` volume, applies the new password with
 `bench set-admin-password`, tears the database back down, stores the password and returns
 it. Takes roughly a minute, most of it waiting for MariaDB. Safe to repeat — each run
-replaces the previous password, and the previous one stops working immediately. It touches
+replaces the previous password, and the previous one stops working immediately; once a
+password is stored, the action asks for confirmation before running. It touches
 only the `Administrator` account; users created inside ERPNext are managed there. This is
 the only place an Administrator password is ever shown, so a password lost between runs is
 recovered by rotating, not by looking it up.

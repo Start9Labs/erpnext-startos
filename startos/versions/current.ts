@@ -1,7 +1,7 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '16.37.0:0',
+  version: '16.37.0:1',
   releaseNotes: {
     en_US: `Updated ERPNext to 16.37.0.
 
@@ -14,7 +14,9 @@ export const current = VersionInfo.of({
 
 Check existing chained Stock Closing Entry balances and use "Regenerate Stock Closing Entry" for affected entries. Existing batch- and serial-tracked Subcontracting Receipt returns need reposting to apply corrected valuations. Regeneration and reposting run as background jobs; allow time according to your stock history and check that they complete before relying on the affected reports.
 
-[Full upstream release notes](https://github.com/frappe/erpnext/releases/tag/v16.37.0)`,
+[Full upstream release notes](https://github.com/frappe/erpnext/releases/tag/v16.37.0)
+
+- Set Administrator Password asks for confirmation before it replaces an existing password.`,
     es_ES: `ERPNext se actualizó a la versión 16.37.0.
 
 **Correcciones y mejoras**
@@ -26,7 +28,9 @@ Check existing chained Stock Closing Entry balances and use "Regenerate Stock Cl
 
 Compruebe los saldos de los registros encadenados de Stock Closing Entry existentes y utilice "Regenerate Stock Closing Entry" para los registros afectados. Las devoluciones existentes de Subcontracting Receipt con seguimiento por lote o número de serie necesitan una nueva contabilización para aplicar las valoraciones corregidas. La regeneración y la nueva contabilización se ejecutan en segundo plano; deje tiempo según su historial de existencias y compruebe que terminen antes de utilizar los informes afectados.
 
-[Notas completas de la versión original](https://github.com/frappe/erpnext/releases/tag/v16.37.0)`,
+[Notas completas de la versión original](https://github.com/frappe/erpnext/releases/tag/v16.37.0)
+
+- Establecer la contraseña de administrador pide confirmación antes de reemplazar una contraseña existente.`,
     de_DE: `ERPNext wurde auf Version 16.37.0 aktualisiert.
 
 **Korrekturen und Verbesserungen**
@@ -38,7 +42,9 @@ Compruebe los saldos de los registros encadenados de Stock Closing Entry existen
 
 Prüfen Sie die Salden bestehender verketteter Stock Closing Entry-Datensätze und verwenden Sie "Regenerate Stock Closing Entry" für betroffene Einträge. Bestehende Rückgaben von Subcontracting Receipt-Datensätzen mit Chargen- oder Seriennummernverfolgung müssen neu verbucht werden, damit die korrigierten Bewertungen gelten. Neuberechnung und Neuverbuchung laufen im Hintergrund; planen Sie je nach Lagerhistorie Zeit ein und prüfen Sie den Abschluss, bevor Sie sich auf die betroffenen Berichte verlassen.
 
-[Vollständige Upstream-Versionshinweise](https://github.com/frappe/erpnext/releases/tag/v16.37.0)`,
+[Vollständige Upstream-Versionshinweise](https://github.com/frappe/erpnext/releases/tag/v16.37.0)
+
+- Administrator-Passwort festlegen fragt vor dem Ersetzen eines bestehenden Passworts nach einer Bestätigung.`,
     pl_PL: `Zaktualizowano ERPNext do wersji 16.37.0.
 
 **Poprawki i ulepszenia**
@@ -50,7 +56,9 @@ Prüfen Sie die Salden bestehender verketteter Stock Closing Entry-Datensätze u
 
 Sprawdź salda istniejących powiązanych wpisów Stock Closing Entry i użyj "Regenerate Stock Closing Entry" dla wpisów wymagających korekty. Istniejące zwroty Subcontracting Receipt śledzone według partii lub numerów seryjnych wymagają ponownego księgowania, aby zastosować poprawione wyceny. Regeneracja i ponowne księgowanie działają w tle; uwzględnij czas zależny od historii zapasów i sprawdź zakończenie zadań, zanim oprzesz się na tych raportach.
 
-[Pełne informacje o wydaniu projektu źródłowego](https://github.com/frappe/erpnext/releases/tag/v16.37.0)`,
+[Pełne informacje o wydaniu projektu źródłowego](https://github.com/frappe/erpnext/releases/tag/v16.37.0)
+
+- Ustaw hasło administratora prosi o potwierdzenie przed zastąpieniem istniejącego hasła.`,
     fr_FR: `ERPNext a été mis à jour vers la version 16.37.0.
 
 **Corrections et améliorations**
@@ -62,7 +70,9 @@ Sprawdź salda istniejących powiązanych wpisów Stock Closing Entry i użyj "R
 
 Vérifiez les soldes des écritures Stock Closing Entry existantes liées entre elles et utilisez "Regenerate Stock Closing Entry" pour les écritures concernées. Les retours Subcontracting Receipt existants suivis par lot ou numéro de série doivent être recomptabilisés pour appliquer les valorisations corrigées. La régénération et la recomptabilisation s'exécutent en arrière-plan ; prévoyez du temps selon votre historique de stocks et vérifiez leur achèvement avant de vous fier aux rapports concernés.
 
-[Notes de version amont complètes](https://github.com/frappe/erpnext/releases/tag/v16.37.0)`,
+[Notes de version amont complètes](https://github.com/frappe/erpnext/releases/tag/v16.37.0)
+
+- Définir le mot de passe administrateur demande une confirmation avant de remplacer un mot de passe existant.`,
   },
   migrations: {
     up: async ({ effects }) => {},

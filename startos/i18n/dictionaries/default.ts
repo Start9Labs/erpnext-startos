@@ -23,6 +23,7 @@ const dict = {
   'Set Administrator Password': 11,
   'Generate a new random password for the Administrator account and apply it. Use this to set the first password, or if you are locked out of ERPNext.': 12,
   'ERPNext Administrator Credentials': 13,
+  'Replaces the Administrator password. The current password stops working immediately.': 21,
   'Use these credentials to sign in to ERPNext.': 14,
   Username: 15,
   Password: 16,
