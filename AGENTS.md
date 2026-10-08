@@ -18,47 +18,34 @@ Freshly scaffolded? Work the
 guide page, not a file in this repo — read it, don't copy it in.
 
 Keep `README.md` (technical reference for an AI support or administering agent) and
-`instructions.md` (end-user docs) in sync with your changes.
+`instructions.md` (end-user docs) in sync with your changes. This file restates neither:
+whoever changes the package has both, so it carries only what they don't — repo mechanics,
+a change that looks right and is not, where the next thing gets added, a naming trap, a
+build or test invocation particular to this repo.
 
-**Bugs and feature requests are GitHub issues on this repo** — file them as you find them.
+**Fix a defect you spot rather than reporting it** — you have the package open and the
+context to be sure. File **a GitHub issue on this repo** only when the call isn't yours to
+make: you can't pin the cause down, two defensible fixes exist, or it's too large to ride on
+the work in hand. An open issue is a report, not a queue — implement one when you're asked
+to or when it's labelled `Approved`, then close it with `Closes #<n>`.
+
 Don't record work in the repo instead: no `TODO.md`, no `NOTES.md`, no `PLAN.md`. What you
 verified, tried, and decided belongs in the commit message and the PR body.
 
 ## This repo
 
-ERPNext is not a single process. This package runs the same split as upstream's
-`frappe_docker` compose file — nginx, gunicorn, a socket.io server, a scheduler and two RQ
-workers, over MariaDB and two redis instances. Before changing `startos/main.ts`, read
-`compose.yaml` and `overrides/` in <https://github.com/frappe/frappe_docker>: the commands,
-the env vars and the startup ordering here are taken from there, and they should stay in
-step with it.
-
-Things that will bite you:
-
-- **All subcontainers share one network namespace**, so they talk over `127.0.0.1` and no
-  two may bind the same port. The two redis instances differ only by port for that reason.
-- **The `sites` volume is shared by every frappe container** and is created empty and
-  root-owned, while the image runs as uid 1000. The `seed-sites` oneshot copies the image's
-  `sites/` skeleton in and hands it over, and has to run before anything else — in `main.ts`
-  and in both init chains.
-- **The site is created once, at install**, by a `runUntilSuccess` chain — MariaDB has to be
-  running for `bench new-site`, which is why this is not a plain `setupOnInit` step. The
-  database name is pinned rather than left to bench, which would otherwise generate a random
-  one per site.
-- **`bench new-site` gets a throwaway Administrator password that is never stored.** The one
-  the user gets is minted by the `set-admin-password` action, which a critical task sends
-  them to before the service may start. Do not add an action that only displays a stored
-  credential — one action generates, stores, applies and returns it, and the same one
-  rotates it.
-- **Backups copy volumes; they do not dump.** `Backups.withMysqlDump` cannot drive a MariaDB
-  11.x image (it calls `mysqld`/`mysqladmin`/`mysqldump`, which no longer exist — see
-  start-technologies#3766). Copying is sound only because StartOS stops the service for a
-  backup; if that ever stops being true, this has to become a logical dump.
-- **Bumping the image means a schema migration.** `bench migrate` runs on `kind === 'update'`
-  inside init, where a failure rolls the update back. Do not move it to a oneshot in `main`.
-- **Credentials never go on a command line** — `bench` reads them from the environment so
-  they stay out of the process table and the service log.
-- **Install progress phases are driven by `bench`'s own stdout** — `Installing frappe...`,
-  `Installing erpnext...`, and its `Updating DocTypes … NN%` bars. Re-check those strings
-  when bumping the image: a reword leaves a bar indeterminate instead of failing anything,
-  so nothing else will tell you.
+- **Keep `startos/main.ts` in step with upstream's `frappe_docker`.** Its commands, env vars
+  and startup ordering come from `compose.yaml` and `overrides/` in
+  <https://github.com/frappe/frappe_docker>; read those before changing any of them.
+- **Every daemon chain starts with the `seed-sites` oneshot** — `main.ts` and both init chains
+  in `init/bootstrapErpnext.ts`. A chain without it runs frappe against a root-owned, empty
+  `sites` volume.
+- **`bench migrate` stays in init on `kind === 'update'`.** Moved to a oneshot in `main`, a
+  failed migration no longer rolls the update back.
+- **Keep backups as a copy of the `db`, `sites` and `main` volumes; don't move them to
+  `withMariadbDump`.** StartOS stops the service for a backup, so the data-directory copy is
+  consistent, and a dump adds a MariaDB process and SQL to run at both ends. Slow restores
+  were a StartOS bug fixed in 0.4.0.2 (start-technologies#3779), not a reason to dump.
+- **Re-check `bench`'s stdout markers when bumping the image** (`Installing frappe...`,
+  `Installing erpnext...`, `Updating DocTypes … NN%` in `init/bootstrapErpnext.ts`). A reworded
+  marker leaves an install phase indeterminate without failing anything.

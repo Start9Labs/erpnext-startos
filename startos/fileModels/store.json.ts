@@ -1,7 +1,7 @@
 import { FileHelper, smtpShape, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
-const shape = z.object({
+const shape = z.looseObject({
   // Minted and applied by the Set Administrator Password action; absent until it runs.
   adminPassword: z.string().optional().catch(undefined),
   // Internal only; bench needs it to create the site and to run schema migrations.

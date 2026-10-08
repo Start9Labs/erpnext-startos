@@ -29,7 +29,7 @@ A release existing does not mean the image exists — check before bumping.
    leading `v` (image tag `v16.32.3` → version `16.32.3:0`). A packaging-only change instead
    keeps the upstream part and increments the revision (`16.32.3:1`).
 3. Write real release notes in every locale — what the user gets, not "internal updates".
-4. `npm run check && make`.
+4. `make`.
 
 ## The database and cache images
 
