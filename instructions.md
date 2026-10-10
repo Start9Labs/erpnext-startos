@@ -60,18 +60,21 @@ It affects only the `Administrator` account; other users are managed inside ERPN
 
 **Configure Email (SMTP)** decides how ERPNext sends invoices, quotes and notifications:
 
-- **Disabled** — ERPNext sends no email at all. This is the default.
+- **Disabled** — disable the email account managed by StartOS. This is the default; email
+  accounts you create inside ERPNext are not disabled.
 - **System Credentials** — use the SMTP server configured once for your whole server in
   StartOS. Available only if you have set one up there.
 - **Custom Credentials** — your own provider. Pick your provider (or "Other"), then give the
   host, the port and whether it uses TLS or STARTTLS, the address mail should come from, and
   your username and password.
 
-The setting is applied the next time ERPNext starts, so restart it afterwards.
+The setting is applied the next time ERPNext starts, so restart it afterwards. If you switch
+to a relay without a password, the managed account's previous SMTP password is cleared.
 
-If the details are wrong, or your mail provider cannot be reached, ERPNext will refuse them
-and carry on with email switched off — it will not stop the service from running. Check the
-service logs for a line beginning `[smtp]`, fix the settings, and restart.
+If ERPNext rejects the settings, it will not stop the service from running. Check the
+service logs for a line beginning `[smtp]`, fix the settings, and restart. Previous settings
+may remain active after a rejected change. Passwordless relays may not be checked until
+mail is sent, so send a test message before relying on them.
 
 You can still create your own Email Account inside ERPNext instead. If you mark one as the
 default outgoing account, ERPNext uses yours rather than the one StartOS manages.
@@ -83,6 +86,13 @@ key, and restores to exactly the site you backed up — same data, same Administ
 password. Before you rely on it, do a restore once to a point where you can check that a
 report you recognize still balances. An accounting backup you have never restored is not yet
 a backup.
+
+## After upgrading
+
+Allow the database upgrade to finish before using ERPNext. Check important accounting and
+stock reports and try routine workflows as an ordinary user, not only as Administrator.
+Upstream tightens access checks; if a workflow now reports a permission error, sign in as
+Administrator and review that user's roles and permissions for the affected records.
 
 ## Troubleshooting
 

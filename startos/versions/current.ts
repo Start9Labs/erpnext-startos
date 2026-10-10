@@ -1,78 +1,73 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '16.37.0:1',
+  version: '16.50.0:0',
   releaseNotes: {
-    en_US: `Updated ERPNext to 16.37.0.
+    en_US: `Updated ERPNext to 16.50.0.
 
-**Fixes and improvements**
+**Features and fixes**
 
-- Faster item searches and more accurate manufacturing stock reservations, transfers, and returns.
-- Foreign-currency subcontracting service costs are converted to company currency; existing orders and draft receipts are updated during the upgrade.
+- New reports find uncancelled stock ledger entries and compare actual versus expected stock valuations. Manufacturing can map raw-material serial and batch numbers to finished goods and check availability across a group warehouse.
+- Corrected payment rounding, manufacturing costs, return quantities and report access controls. Frappe adds recovery of supported edits to standard workspaces after upgrades.
+- Switching to a passwordless SMTP relay clears the previous password. Rejected email settings now warn that previous settings may remain active.
 
 **After upgrading**
 
-Check existing chained Stock Closing Entry balances and use "Regenerate Stock Closing Entry" for affected entries. Existing batch- and serial-tracked Subcontracting Receipt returns need reposting to apply corrected valuations. Regeneration and reposting run as background jobs; allow time according to your stock history and check that they complete before relying on the affected reports.
+Try routine workflows with your ordinary users: stricter record access checks can affect custom roles. The upgrade removes the broad All-role grant on Payment Terms Template; editing Quality Management documents requires Quality Manager. Review affected roles and document permissions rather than granting unrestricted access.
 
-[Full upstream release notes](https://github.com/frappe/erpnext/releases/tag/v16.37.0)
+Full upstream notes: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.50.0), [Frappe navigation and workspace changes](https://github.com/frappe/frappe/releases/tag/v16.50.0), [Frappe fixes](https://github.com/frappe/frappe/releases/tag/v16.51.0)`,
+    es_ES: `ERPNext se actualizó a la versión 16.50.0.
 
-- Set Administrator Password asks for confirmation before it replaces an existing password.`,
-    es_ES: `ERPNext se actualizó a la versión 16.37.0.
+**Funciones y correcciones**
 
-**Correcciones y mejoras**
-
-- Búsquedas de artículos más rápidas y mayor precisión en las reservas, transferencias y devoluciones de existencias de fabricación.
-- Los costes de servicios de subcontratación en moneda extranjera se convierten a la moneda de la empresa; los pedidos existentes y las recepciones en borrador se actualizan durante la actualización.
+- Nuevos informes detectan movimientos del libro mayor de existencias que no se cancelaron y comparan la valoración real con la esperada. En fabricación se pueden vincular números de serie y lotes de materias primas con productos terminados y comprobar la disponibilidad en un almacén de grupo.
+- Se corrigieron el redondeo de pagos, los costes de fabricación, las cantidades devueltas y los controles de acceso a informes. Frappe permite recuperar cambios compatibles en espacios de trabajo estándar después de actualizar.
+- Al cambiar a un servidor SMTP sin contraseña se borra la contraseña anterior. Si se rechazan los ajustes de correo, ahora se advierte que los anteriores pueden seguir activos.
 
 **Después de actualizar**
 
-Compruebe los saldos de los registros encadenados de Stock Closing Entry existentes y utilice "Regenerate Stock Closing Entry" para los registros afectados. Las devoluciones existentes de Subcontracting Receipt con seguimiento por lote o número de serie necesitan una nueva contabilización para aplicar las valoraciones corregidas. La regeneración y la nueva contabilización se ejecutan en segundo plano; deje tiempo según su historial de existencias y compruebe que terminen antes de utilizar los informes afectados.
+Pruebe los procesos habituales con usuarios normales: los controles de acceso más estrictos pueden afectar a roles personalizados. La actualización elimina el permiso general del rol All en Payment Terms Template; para editar documentos de gestión de calidad se necesita Quality Manager. Revise los roles y permisos afectados en lugar de conceder acceso sin restricciones.
 
-[Notas completas de la versión original](https://github.com/frappe/erpnext/releases/tag/v16.37.0)
+Notas completas de las versiones originales: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.50.0), [cambios de navegación y espacios de trabajo de Frappe](https://github.com/frappe/frappe/releases/tag/v16.50.0), [correcciones de Frappe](https://github.com/frappe/frappe/releases/tag/v16.51.0)`,
+    de_DE: `ERPNext wurde auf Version 16.50.0 aktualisiert.
 
-- Establecer la contraseña de administrador pide confirmación antes de reemplazar una contraseña existente.`,
-    de_DE: `ERPNext wurde auf Version 16.37.0 aktualisiert.
+**Funktionen und Fehlerbehebungen**
 
-**Korrekturen und Verbesserungen**
-
-- Schnellere Artikelsuche und genauere Lagerreservierungen, Umlagerungen und Rückgaben in der Fertigung.
-- Fremdwährungskosten für Fremdfertigungsleistungen werden in die Unternehmenswährung umgerechnet; bestehende Aufträge und Wareneingangsentwürfe werden beim Upgrade aktualisiert.
+- Neue Berichte finden nicht stornierte Lagerbucheinträge und vergleichen tatsächliche mit erwarteten Lagerbewertungen. In der Fertigung lassen sich Serien- und Chargennummern von Rohstoffen den Fertigprodukten zuordnen und Bestände über ein Gruppenlager prüfen.
+- Zahlungsrundungen, Fertigungskosten, Rückgabemengen und Berichtszugriffe wurden korrigiert. Frappe ermöglicht nach Upgrades die Wiederherstellung unterstützter Änderungen an Standard-Arbeitsbereichen.
+- Beim Wechsel zu einem SMTP-Relay ohne Passwort wird das bisherige Passwort gelöscht. Bei abgelehnten E-Mail-Einstellungen wird darauf hingewiesen, dass bisherige Einstellungen aktiv bleiben können.
 
 **Nach dem Upgrade**
 
-Prüfen Sie die Salden bestehender verketteter Stock Closing Entry-Datensätze und verwenden Sie "Regenerate Stock Closing Entry" für betroffene Einträge. Bestehende Rückgaben von Subcontracting Receipt-Datensätzen mit Chargen- oder Seriennummernverfolgung müssen neu verbucht werden, damit die korrigierten Bewertungen gelten. Neuberechnung und Neuverbuchung laufen im Hintergrund; planen Sie je nach Lagerhistorie Zeit ein und prüfen Sie den Abschluss, bevor Sie sich auf die betroffenen Berichte verlassen.
+Prüfen Sie alltägliche Abläufe mit normalen Benutzern: strengere Zugriffsprüfungen können benutzerdefinierte Rollen betreffen. Das Upgrade entfernt die allgemeine Berechtigung der Rolle All für Payment Terms Template; zum Bearbeiten von Qualitätsmanagement-Dokumenten ist Quality Manager erforderlich. Prüfen Sie betroffene Rollen und Dokumentberechtigungen, statt uneingeschränkten Zugriff zu vergeben.
 
-[Vollständige Upstream-Versionshinweise](https://github.com/frappe/erpnext/releases/tag/v16.37.0)
+Vollständige Upstream-Versionshinweise: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.50.0), [Frappe-Navigation und Arbeitsbereiche](https://github.com/frappe/frappe/releases/tag/v16.50.0), [Frappe-Fehlerbehebungen](https://github.com/frappe/frappe/releases/tag/v16.51.0)`,
+    pl_PL: `Zaktualizowano ERPNext do wersji 16.50.0.
 
-- Administrator-Passwort festlegen fragt vor dem Ersetzen eines bestehenden Passworts nach einer Bestätigung.`,
-    pl_PL: `Zaktualizowano ERPNext do wersji 16.37.0.
+**Funkcje i poprawki**
 
-**Poprawki i ulepszenia**
-
-- Szybsze wyszukiwanie artykułów i dokładniejsze rezerwacje, przesunięcia oraz zwroty zapasów w produkcji.
-- Koszty usług podwykonawstwa w walucie obcej są przeliczane na walutę firmy; istniejące zamówienia i robocze dokumenty przyjęcia są aktualizowane podczas aktualizacji.
+- Nowe raporty wykrywają nieanulowane wpisy rejestru magazynowego i porównują rzeczywistą wycenę zapasów z oczekiwaną. Produkcja pozwala powiązać numery seryjne i partie surowców z wyrobami gotowymi oraz sprawdzić dostępność w grupie magazynów.
+- Poprawiono zaokrąglanie płatności, koszty produkcji, ilości zwrotów i kontrolę dostępu do raportów. Frappe pozwala po aktualizacji odzyskać obsługiwane zmiany w standardowych obszarach roboczych.
+- Przejście na serwer SMTP bez hasła usuwa poprzednie hasło. Odrzucenie ustawień poczty wyświetla teraz ostrzeżenie, że poprzednie ustawienia mogą nadal działać.
 
 **Po aktualizacji**
 
-Sprawdź salda istniejących powiązanych wpisów Stock Closing Entry i użyj "Regenerate Stock Closing Entry" dla wpisów wymagających korekty. Istniejące zwroty Subcontracting Receipt śledzone według partii lub numerów seryjnych wymagają ponownego księgowania, aby zastosować poprawione wyceny. Regeneracja i ponowne księgowanie działają w tle; uwzględnij czas zależny od historii zapasów i sprawdź zakończenie zadań, zanim oprzesz się na tych raportach.
+Sprawdź codzienne procesy na kontach zwykłych użytkowników: bardziej rygorystyczna kontrola dostępu może wpłynąć na role niestandardowe. Aktualizacja usuwa ogólne uprawnienie roli All do Payment Terms Template; edycja dokumentów zarządzania jakością wymaga Quality Manager. Sprawdź odpowiednie role i uprawnienia do dokumentów zamiast przyznawać nieograniczony dostęp.
 
-[Pełne informacje o wydaniu projektu źródłowego](https://github.com/frappe/erpnext/releases/tag/v16.37.0)
+Pełne informacje o wydaniach projektu źródłowego: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.50.0), [nawigacja i obszary robocze Frappe](https://github.com/frappe/frappe/releases/tag/v16.50.0), [poprawki Frappe](https://github.com/frappe/frappe/releases/tag/v16.51.0)`,
+    fr_FR: `ERPNext a été mis à jour vers la version 16.50.0.
 
-- Ustaw hasło administratora prosi o potwierdzenie przed zastąpieniem istniejącego hasła.`,
-    fr_FR: `ERPNext a été mis à jour vers la version 16.37.0.
+**Fonctionnalités et correctifs**
 
-**Corrections et améliorations**
-
-- Recherche d'articles plus rapide et réservations, transferts et retours de stocks de fabrication plus précis.
-- Les coûts des services de sous-traitance en devise étrangère sont convertis dans la devise de l'entreprise ; les commandes existantes et les réceptions en brouillon sont mises à jour pendant la mise à niveau.
+- De nouveaux rapports détectent les écritures de stock non annulées et comparent la valorisation réelle à celle attendue. La fabrication permet de relier les numéros de série et lots des matières premières aux produits finis et de vérifier la disponibilité dans un groupe d'entrepôts.
+- Les arrondis des paiements, coûts de fabrication, quantités retournées et contrôles d'accès aux rapports ont été corrigés. Frappe permet de récupérer les modifications prises en charge des espaces de travail standard après une mise à niveau.
+- Le passage à un relais SMTP sans mot de passe efface l'ancien mot de passe. Le rejet des paramètres de messagerie avertit désormais que les anciens paramètres peuvent rester actifs.
 
 **Après la mise à niveau**
 
-Vérifiez les soldes des écritures Stock Closing Entry existantes liées entre elles et utilisez "Regenerate Stock Closing Entry" pour les écritures concernées. Les retours Subcontracting Receipt existants suivis par lot ou numéro de série doivent être recomptabilisés pour appliquer les valorisations corrigées. La régénération et la recomptabilisation s'exécutent en arrière-plan ; prévoyez du temps selon votre historique de stocks et vérifiez leur achèvement avant de vous fier aux rapports concernés.
+Testez les opérations habituelles avec vos utilisateurs ordinaires : les contrôles d'accès renforcés peuvent affecter les rôles personnalisés. La mise à niveau supprime l'autorisation générale du rôle All sur Payment Terms Template ; la modification des documents de gestion de la qualité nécessite Quality Manager. Vérifiez les rôles et autorisations concernés plutôt que d'accorder un accès illimité.
 
-[Notes de version amont complètes](https://github.com/frappe/erpnext/releases/tag/v16.37.0)
-
-- Définir le mot de passe administrateur demande une confirmation avant de remplacer un mot de passe existant.`,
+Notes de version amont complètes : [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.50.0), [navigation et espaces de travail Frappe](https://github.com/frappe/frappe/releases/tag/v16.50.0), [correctifs Frappe](https://github.com/frappe/frappe/releases/tag/v16.51.0)`,
   },
   migrations: {
     up: async ({ effects }) => {},
