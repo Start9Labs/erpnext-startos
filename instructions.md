@@ -87,13 +87,6 @@ password. Before you rely on it, do a restore once to a point where you can chec
 report you recognize still balances. An accounting backup you have never restored is not yet
 a backup.
 
-## After upgrading
-
-Allow the database upgrade to finish before using ERPNext. Check important accounting and
-stock reports and try routine workflows as an ordinary user, not only as Administrator.
-Upstream tightens access checks; if a workflow now reports a permission error, sign in as
-Administrator and review that user's roles and permissions for the affected records.
-
 ## Troubleshooting
 
 **The web interface never becomes healthy.** The database and application server start
