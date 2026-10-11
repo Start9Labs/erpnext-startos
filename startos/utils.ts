@@ -167,10 +167,8 @@ export const buildSmtpFields = (smtp: T.SmtpValue) => {
     use_ssl_for_outgoing: smtp.security === 'tls' ? 1 : 0,
     login_id_is_different: separateLogin ? 1 : 0,
     ...(separateLogin ? { login_id: smtp.username } : {}),
-    // frappe refuses to save an unauthenticated account unless this says so.
-    ...(smtp.password
-      ? { password: smtp.password }
-      : { no_smtp_authentication: 1 }),
+    password: smtp.password ?? '',
+    no_smtp_authentication: smtp.password ? 0 : 1,
     enable_outgoing: 1,
     enable_incoming: 0,
     always_use_account_email_id_as_sender: 1,
@@ -190,7 +188,7 @@ export const smtpApplyScript = [
   `--args '["Email Account","${smtpAccountName}",${smtpFields}]'`,
   `|| bench --site ${siteName} execute frappe.client.insert`,
   `--args '[dict(${smtpFields},doctype="Email Account",email_account_name="${smtpAccountName}")]'`,
-  `|| echo "[smtp] ERPNext rejected the email settings — it tests the connection when saving an outgoing account. Mail is left unconfigured; check the credentials and that the relay is reachable, then restart." >&2;`,
+  `|| echo "[smtp] ERPNext rejected the email settings. Previous email settings may still be active; check the credentials and that the relay is reachable, then restart." >&2;`,
   `rm -f /tmp/smtp.json;`,
   `else`,
   `bench --site ${siteName} execute frappe.client.set_value`,

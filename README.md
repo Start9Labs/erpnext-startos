@@ -98,8 +98,9 @@ Three volumes, all included in backups. The ledger itself is MariaDB's data dire
 
 The `sites` volume is created root-owned and empty by StartOS while every frappe process
 runs as uid 1000, so the `seed-sites` oneshot fills it from the image and hands it over
-before anything else starts. It is a `cp -rn`, so it never overwrites an existing file and
-is a no-op on every later start.
+before any frappe process starts. Its `cp -rn` keeps existing site files. On each start,
+the backend's image entrypoint replaces `sites/assets` with a symlink to the image's baked
+assets, so an upgrade serves the matching JavaScript and styles without changing uploads.
 
 ## File Models
 
@@ -165,7 +166,8 @@ recovered by rotating, not by looking it up.
 It writes the choice to `store.json` and nothing else — the `smtp` oneshot applies it to
 ERPNext's Email Account on the next start, so the service must be restarted for a change to
 take effect. Safe to repeat. Whether the settings work is decided by ERPNext, not by
-StartOS: see [Limitations and Differences](#limitations-and-differences).
+StartOS: see [Limitations and Differences](#limitations-and-differences). Switching to a
+passwordless relay clears the managed account's previous SMTP password.
 
 ## Tasks
 
@@ -224,10 +226,11 @@ StartOS control replaces an ERPNext one.
    exactly one, under a fixed site name and a fixed database name.
 2. **Email settings apply on the next start.** The Configure Email action stores the choice;
    the `smtp` oneshot writes it into ERPNext when the service starts.
-3. **Email settings are validated by ERPNext, not by StartOS.** ERPNext opens a real SMTP
-   session when it saves an outgoing account, so a wrong password or an unreachable relay is
-   only discovered at start. It is reported in the service log as a `[smtp]` line and mail is
-   left unconfigured — it never blocks startup.
+3. **Email settings are validated by ERPNext, not by StartOS.** ERPNext checks authenticated
+   SMTP connections when saving an outgoing account; passwordless relays may fail only when
+   sending. A rejected configuration is reported in the service log as a `[smtp]` line and
+   never blocks startup. An existing account can retain its previous settings after a
+   rejected update; failure does not guarantee mail is disabled.
 4. **A mail account you create yourself wins.** If you set your own default outgoing Email
    Account inside ERPNext, ERPNext uses it in preference to the one this package manages.
 5. **Setting the Administrator password requires the service to be stopped**, because the
