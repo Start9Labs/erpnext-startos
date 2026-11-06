@@ -17,7 +17,7 @@ export const sitesDir = `${benchDir}/sites`
 export const dbDir = '/var/lib/mysql'
 
 // uid:gid of the `frappe` user inside the upstream image.
-export const frappeOwner = '1000:1000'
+export const frappeOwner = '1000:0'
 
 export const sitesMount = sdk.Mounts.of().mountVolume({
   volumeId: 'sites',
@@ -77,6 +77,7 @@ export const mariadbFlags = [
   '--character-set-server=utf8mb4',
   '--collation-server=utf8mb4_unicode_ci',
   '--skip-character-set-client-handshake',
+  '--innodb-snapshot-isolation=OFF',
 ]
 
 export const getMariadbEnv = (rootPassword: string) => ({
