@@ -1,58 +1,63 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '16.53.0:0',
+  version: '16.54.0:0',
   releaseNotes: {
-    en_US: `Updated ERPNext to 16.53.0 with Frappe 16.54.0 and the StartOS SDK to 3.1.1.
+    en_US: `Updated ERPNext to 16.54.0 with Frappe 16.55.2.
 
-- BOM Creator becomes a design workspace with STEP/CSV import, a 3D viewer, and design revisions.
-- Corrected accounting reports, stock valuation, manufacturing quantities, payments, and access controls. Improved PDF printing.
+- Added pro forma invoices, customer holds, company-specific access restrictions, and faster stock-balance snapshots.
+- Improved manufacturing process-loss planning, stock reservations, financial statements, payments, and access controls.
+- Reduced database conflict errors in background jobs.
 
 **Upgrade considerations**
 
-The database migration converts existing BOM Creator designs, corrects affected Work Order operation and Job Card transfer quantities, updates unchanged standard IFRS cash-flow formulas and matching generated cheque formats, and applies Selling Settings section visibility. Duplicate bank balances for the same account and date are reduced to the most recently modified entry; Voice Call Settings become private to each user and lose existing shares. Allow extra time for large histories and check these records, reports, printing, and custom-role access after updating.
+Requires StartOS 0.4.1 or later. Integrations calling data-changing ERPNext methods with GET must switch to POST. The database upgrade backfills payment schedules, production-plan stock balances, quotation and work-order quantities, asset adjustments, lost-opportunity dates, appointment sharing, dunning statuses, and POS cash change. Allow extra time for large histories and check these records, access permissions, and PDF printing after updating. Existing submitted BOM material breakdowns retain their values until a child BOM is replaced or a new BOM is created.
 
-Full upstream release notes: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.53.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.54.0)`,
-    es_ES: `ERPNext se actualizó a la versión 16.53.0 con Frappe 16.54.0 y el SDK de StartOS a 3.1.1.
+Full upstream release notes: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.54.0), [Frappe 16.55.0](https://github.com/frappe/frappe/releases/tag/v16.55.0), [Frappe 16.55.2](https://github.com/frappe/frappe/releases/tag/v16.55.2)`,
+    es_ES: `ERPNext se actualizó a la versión 16.54.0 con Frappe 16.55.2.
 
-- BOM Creator se convierte en un espacio de diseño con importación STEP/CSV, visor 3D y revisiones de diseños.
-- Se corrigieron informes contables, valoración de existencias, cantidades de fabricación, pagos y controles de acceso. Se mejoró la impresión de PDF.
+- Se añadieron facturas proforma, bloqueos de clientes, restricciones de acceso por empresa e instantáneas más rápidas del saldo de existencias.
+- Se mejoraron la planificación de pérdidas de fabricación, las reservas de existencias, los estados financieros, los pagos y los controles de acceso.
+- Se redujeron los errores de conflicto de la base de datos en tareas en segundo plano.
 
 **Consideraciones para la actualización**
 
-La migración de la base de datos convierte los diseños existentes de BOM Creator, corrige las cantidades afectadas de operaciones de Work Order y transferencias de Job Card, actualiza las fórmulas estándar de flujo de efectivo IFRS sin modificar y los formatos de cheques generados que coinciden con su plantilla, y aplica la visibilidad de secciones de Selling Settings. Los saldos bancarios duplicados para una misma cuenta y fecha se reducen al registro modificado más recientemente; Voice Call Settings pasa a ser privado para cada usuario y pierde los accesos compartidos existentes. Prevea más tiempo para historiales grandes y compruebe estos registros, informes, impresión y acceso de roles personalizados después de actualizar.
+Requiere StartOS 0.4.1 o posterior. Las integraciones que llaman a métodos de ERPNext que modifican datos mediante GET deben usar POST. La actualización de la base de datos completa o recalcula calendarios de pagos, saldos de existencias de planes de producción, cantidades de cotizaciones y órdenes de trabajo, ajustes de activos, fechas de oportunidades perdidas, accesos compartidos de citas, estados de reclamaciones de pago y cambio en efectivo de facturas POS. Prevea más tiempo para historiales grandes y compruebe estos registros, los permisos de acceso y la impresión de PDF después de actualizar. Los desgloses de materiales de las BOM ya confirmadas conservan sus valores hasta que se sustituya una BOM secundaria o se cree una nueva BOM.
 
-Notas completas de las versiones originales: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.53.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.54.0)`,
-    de_DE: `ERPNext wurde auf Version 16.53.0 mit Frappe 16.54.0 und das StartOS-SDK auf 3.1.1 aktualisiert.
+Notas completas de las versiones originales: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.54.0), [Frappe 16.55.0](https://github.com/frappe/frappe/releases/tag/v16.55.0), [Frappe 16.55.2](https://github.com/frappe/frappe/releases/tag/v16.55.2)`,
+    de_DE: `ERPNext wurde auf Version 16.54.0 mit Frappe 16.55.2 aktualisiert.
 
-- BOM Creator wird zum Design-Arbeitsbereich mit STEP-/CSV-Import, 3D-Ansicht und Designrevisionen.
-- Buchhaltungsberichte, Bestandsbewertung, Fertigungsmengen, Zahlungen und Zugriffskontrollen wurden korrigiert. Der PDF-Druck wurde verbessert.
+- Proformarechnungen, Kundensperren, unternehmensbezogene Zugriffsbeschränkungen und schnellere Lagerbestandsschnappschüsse wurden hinzugefügt.
+- Planung von Fertigungsverlusten, Bestandsreservierungen, Finanzberichte, Zahlungen und Zugriffskontrollen wurden verbessert.
+- Datenbankkonflikte bei Hintergrundaufgaben wurden reduziert.
 
 **Hinweise zum Upgrade**
 
-Die Datenbankmigration konvertiert bestehende BOM-Creator-Designs, korrigiert betroffene Mengen von Work-Order-Vorgängen und Job-Card-Transfers, aktualisiert unveränderte IFRS-Standardformeln für den Cashflow sowie zur Vorlage passende erzeugte Scheckformate und übernimmt die Abschnittssichtbarkeit aus Selling Settings. Von doppelten Banksalden für dasselbe Konto und Datum bleibt nur der zuletzt geänderte Eintrag erhalten; Voice Call Settings werden benutzerprivat und verlieren bestehende Freigaben. Planen Sie bei umfangreichen Historien zusätzliche Zeit ein und prüfen Sie diese Datensätze, Berichte, Druckausgaben und den Zugriff benutzerdefinierter Rollen nach dem Upgrade.
+Erfordert StartOS 0.4.1 oder neuer. Integrationen, die datenändernde ERPNext-Methoden mit GET aufrufen, müssen auf POST wechseln. Das Datenbank-Upgrade ergänzt oder berechnet Zahlungspläne, Lagerbestände von Produktionsplänen, Angebots- und Fertigungsauftragsmengen, Anlagenanpassungen, Verlustdaten von Verkaufschancen, Terminfreigaben, Mahnstatus und POS-Wechselgeldbeträge neu. Planen Sie bei umfangreichen Historien zusätzliche Zeit ein und prüfen Sie diese Datensätze, Zugriffsberechtigungen und den PDF-Druck nach dem Upgrade. Materialaufstellungen bereits bestätigter Stücklisten behalten ihre Werte, bis eine untergeordnete Stückliste ersetzt oder eine neue Stückliste erstellt wird.
 
-Vollständige Upstream-Versionshinweise: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.53.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.54.0)`,
-    pl_PL: `Zaktualizowano ERPNext do wersji 16.53.0 z Frappe 16.54.0 oraz SDK StartOS do 3.1.1.
+Vollständige Upstream-Versionshinweise: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.54.0), [Frappe 16.55.0](https://github.com/frappe/frappe/releases/tag/v16.55.0), [Frappe 16.55.2](https://github.com/frappe/frappe/releases/tag/v16.55.2)`,
+    pl_PL: `Zaktualizowano ERPNext do wersji 16.54.0 z Frappe 16.55.2.
 
-- BOM Creator staje się przestrzenią projektową z importem STEP/CSV, przeglądarką 3D i rewizjami projektów.
-- Poprawiono raporty księgowe, wycenę zapasów, ilości produkcyjne, płatności i kontrolę dostępu. Ulepszono drukowanie PDF.
+- Dodano faktury pro forma, blokady klientów, ograniczenia dostępu według firmy i szybsze migawki sald magazynowych.
+- Ulepszono planowanie strat produkcyjnych, rezerwacje zapasów, sprawozdania finansowe, płatności i kontrolę dostępu.
+- Ograniczono błędy konfliktów bazy danych w zadaniach w tle.
 
 **Uwagi dotyczące aktualizacji**
 
-Migracja bazy danych konwertuje istniejące projekty BOM Creator, poprawia odpowiednie ilości operacji Work Order i przesunięć Job Card, aktualizuje niezmienione standardowe formuły przepływów pieniężnych IFRS oraz wygenerowane formaty czeków zgodne z szablonem, a także stosuje widoczność sekcji z Selling Settings. Spośród zduplikowanych sald bankowych dla tego samego konta i daty pozostaje ostatnio zmodyfikowany wpis; Voice Call Settings stają się prywatne dla każdego użytkownika i tracą dotychczasowe udostępnienia. Przy obszernej historii przewidź więcej czasu i sprawdź te rekordy, raporty, wydruki oraz dostęp ról niestandardowych po aktualizacji.
+Wymaga StartOS 0.4.1 lub nowszego. Integracje wywołujące metody ERPNext zmieniające dane przez GET muszą przejść na POST. Aktualizacja bazy danych uzupełnia lub przelicza harmonogramy płatności, salda zapasów planów produkcyjnych, ilości ofert i zleceń produkcyjnych, korekty aktywów, daty utraty szans sprzedaży, udostępnienia spotkań, statusy monitów i resztę gotówkową na fakturach POS. Przy obszernej historii przewidź więcej czasu, a po aktualizacji sprawdź te rekordy, uprawnienia dostępu i drukowanie PDF. Rozbicia materiałowe zatwierdzonych BOM zachowują swoje wartości do zastąpienia podrzędnego BOM lub utworzenia nowego BOM.
 
-Pełne informacje o wydaniach projektów źródłowych: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.53.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.54.0)`,
-    fr_FR: `ERPNext a été mis à jour vers la version 16.53.0 avec Frappe 16.54.0 et le SDK StartOS vers 3.1.1.
+Pełne informacje o wydaniach projektów źródłowych: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.54.0), [Frappe 16.55.0](https://github.com/frappe/frappe/releases/tag/v16.55.0), [Frappe 16.55.2](https://github.com/frappe/frappe/releases/tag/v16.55.2)`,
+    fr_FR: `ERPNext a été mis à jour vers la version 16.54.0 avec Frappe 16.55.2.
 
-- BOM Creator devient un espace de conception avec import STEP/CSV, visualisation 3D et révisions des conceptions.
-- Corrections des rapports comptables, de la valorisation des stocks, des quantités de fabrication, des paiements et des contrôles d’accès. Amélioration de l’impression PDF.
+- Ajout des factures pro forma, des blocages de clients, des restrictions d’accès par société et d’instantanés plus rapides des soldes de stock.
+- Amélioration de la planification des pertes de fabrication, des réservations de stock, des états financiers, des paiements et des contrôles d’accès.
+- Réduction des erreurs de conflit de base de données dans les tâches en arrière-plan.
 
 **Points à vérifier lors de la mise à niveau**
 
-La migration de la base de données convertit les conceptions BOM Creator existantes, corrige les quantités concernées des opérations Work Order et des transferts Job Card, met à jour les formules standard IFRS de flux de trésorerie non modifiées ainsi que les formats de chèques générés correspondant à leur modèle, et applique la visibilité des sections de Selling Settings. Les soldes bancaires en double pour un même compte et une même date sont réduits à l’entrée modifiée le plus récemment ; Voice Call Settings devient privé pour chaque utilisateur et perd les partages existants. Prévoyez davantage de temps pour les historiques volumineux et vérifiez ces enregistrements, rapports, impressions et accès des rôles personnalisés après la mise à jour.
+Nécessite StartOS 0.4.1 ou ultérieur. Les intégrations appelant des méthodes ERPNext qui modifient des données avec GET doivent passer à POST. La mise à niveau de la base de données complète ou recalcule les échéanciers de paiement, les stocks des plans de production, les quantités des devis et des ordres de fabrication, les ajustements d’actifs, les dates de perte d’opportunités, les partages de rendez-vous, les états des relances et la monnaie rendue des factures POS. Prévoyez davantage de temps pour les historiques volumineux et vérifiez ces enregistrements, les droits d’accès et l’impression PDF après la mise à jour. Les décompositions de matières des nomenclatures déjà soumises conservent leurs valeurs jusqu’au remplacement d’une nomenclature enfant ou à la création d’une nouvelle nomenclature.
 
-Notes de version amont complètes : [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.53.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.54.0)`,
+Notes de version amont complètes : [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.54.0), [Frappe 16.55.0](https://github.com/frappe/frappe/releases/tag/v16.55.0), [Frappe 16.55.2](https://github.com/frappe/frappe/releases/tag/v16.55.2)`,
   },
   migrations: {
     up: async ({ effects }) => {},
