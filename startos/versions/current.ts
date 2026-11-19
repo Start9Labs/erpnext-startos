@@ -1,63 +1,68 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '16.55.0:0',
+  version: '16.60.0:0',
   releaseNotes: {
-    en_US: `Updated ERPNext to 16.55.0 with Frappe 16.56.0.
+    en_US: `Updated ERPNext to 16.60.0 with Frappe 16.60.2.
 
-- Added consolidated receivables/payables reports across companies and reporting-date exchange rates in the General Ledger.
-- Corrected stock valuation, serial/batch picking, subcontracting returns, manufacturing quantities, payments, and access controls.
-- Improved PDF printing, file uploads, and email handling; updated PDF-processing dependencies to address security issues.
+- New Customer and Supplier overview dashboards, a revamped Projects form with task management and costing, a Day Book report, and new report print formats with a full-page print preview.
+- Desk now works on phones and tablets, list views gain a new filter panel, and child tables can be imported from CSV, Excel, or Google Sheets.
+- Adds Studio (beta), a visual app and portal builder, and Flow, an optional AI assistant panel in Desk.
+- Hundreds of fixes across accounting, selling, buying, stock, manufacturing, subcontracting, and assets, and tighter permission checks throughout.
 
 **Upgrade considerations**
 
-Requires StartOS 0.4.2 or later. The database upgrade restores automatic payment reconciliation schedules and standard amount-in-words print visibility, updates affected Work Order operation statuses and open Job Card quantities, restricts company-address flags to managing roles, and rebuilds item-search indexes in the background. Allow extra time for large histories and check these records, stock reports, printing, and custom-role access after updating. Snapshot report frequency becomes weekly. Renaming a user requires setting up their two-factor login again. Integrations triggering processing actions through GET links must switch to POST.
+You may need to sign in again after updating. Existing sites keep classic dashboards; a System Manager can switch to Insights dashboards in System Settings.
 
-Full upstream release notes: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.55.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.56.0)`,
-    es_ES: `ERPNext se actualizó a la versión 16.55.0 con Frappe 16.56.0.
+Full upstream release notes: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.60.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.60.0)`,
+    es_ES: `ERPNext se actualizó a la versión 16.60.0 con Frappe 16.60.2.
 
-- Se añadieron informes consolidados de cuentas por cobrar y pagar entre empresas y tipos de cambio de la fecha del informe en el libro mayor.
-- Se corrigieron la valoración de existencias, la preparación por números de serie y lotes, las devoluciones de subcontratación, las cantidades de fabricación, los pagos y los controles de acceso.
-- Se mejoraron la impresión de PDF, la carga de archivos y el correo electrónico; se actualizaron las dependencias de procesamiento de PDF para corregir problemas de seguridad.
+- Nuevos paneles de resumen de clientes y proveedores, un formulario de proyectos renovado con gestión de tareas y costes, un informe de libro diario y nuevos formatos de impresión de informes con vista previa a página completa.
+- Desk ahora funciona en teléfonos y tabletas, las vistas de lista incorporan un nuevo panel de filtros y las tablas secundarias pueden importarse desde CSV, Excel o Google Sheets.
+- Se añaden Studio (beta), un constructor visual de aplicaciones y portales, y Flow, un panel opcional de asistente de IA en Desk.
+- Cientos de correcciones en contabilidad, ventas, compras, existencias, fabricación, subcontratación y activos, y comprobaciones de permisos más estrictas en todo el sistema.
 
 **Consideraciones para la actualización**
 
-Requiere StartOS 0.4.2 o posterior. La actualización de la base de datos restaura los horarios de conciliación automática de pagos y la visibilidad estándar de los importes en letras al imprimir, actualiza los estados afectados de las operaciones de Work Order y las cantidades de Job Card abiertos, restringe las marcas de dirección de empresa a los roles de gestión y reconstruye los índices de búsqueda de artículos en segundo plano. Prevea más tiempo para historiales grandes y compruebe estos registros, los informes de existencias, la impresión y el acceso de roles personalizados después de actualizar. La frecuencia de los informes de instantáneas pasa a ser semanal. Al cambiar el nombre de un usuario, debe configurarse de nuevo su acceso de dos factores. Las integraciones que activan acciones de procesamiento mediante enlaces GET deben usar POST.
+Es posible que deba iniciar sesión de nuevo después de actualizar. Los sitios existentes conservan los paneles clásicos; un System Manager puede cambiar a los paneles de Insights en System Settings.
 
-Notas completas de las versiones originales: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.55.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.56.0)`,
-    de_DE: `ERPNext wurde auf Version 16.55.0 mit Frappe 16.56.0 aktualisiert.
+Notas completas de las versiones originales: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.60.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.60.0)`,
+    de_DE: `ERPNext wurde auf Version 16.60.0 mit Frappe 16.60.2 aktualisiert.
 
-- Unternehmensübergreifende Berichte zu Forderungen und Verbindlichkeiten sowie stichtagsbezogene Wechselkurse im Hauptbuch wurden hinzugefügt.
-- Bestandsbewertung, Seriennummern- und Chargenkommissionierung, Fremdfertigungsretouren, Fertigungsmengen, Zahlungen und Zugriffskontrollen wurden korrigiert.
-- PDF-Druck, Datei-Uploads und E-Mail-Verarbeitung wurden verbessert; PDF-Abhängigkeiten wurden zur Behebung von Sicherheitsproblemen aktualisiert.
+- Neue Übersichts-Dashboards für Kunden und Lieferanten, ein überarbeitetes Projektformular mit Aufgabenverwaltung und Kostenrechnung, ein Journalbericht sowie neue Berichtsdruckformate mit ganzseitiger Druckvorschau.
+- Desk funktioniert jetzt auf Smartphones und Tablets, Listenansichten erhalten ein neues Filterfeld, und Untertabellen lassen sich aus CSV, Excel oder Google Sheets importieren.
+- Neu sind Studio (Beta), ein visueller Baukasten für Apps und Portale, und Flow, ein optionaler KI-Assistent als Seitenleiste in Desk.
+- Hunderte Korrekturen in Buchhaltung, Verkauf, Einkauf, Lager, Fertigung, Fremdfertigung und Anlagen sowie durchgängig strengere Berechtigungsprüfungen.
 
 **Hinweise zum Upgrade**
 
-Erfordert StartOS 0.4.2 oder neuer. Das Datenbank-Upgrade stellt Zeitpläne für den automatischen Zahlungsabgleich und die standardmäßige Drucksichtbarkeit von Beträgen in Worten wieder her, aktualisiert betroffene Work-Order-Vorgangsstatus und Mengen offener Job Cards, beschränkt Unternehmensadressmarkierungen auf Verwaltungsrollen und baut Artikelsuchindizes im Hintergrund neu auf. Planen Sie bei umfangreichen Historien zusätzliche Zeit ein und prüfen Sie diese Datensätze, Lagerberichte, Druckausgaben und den Zugriff benutzerdefinierter Rollen nach dem Upgrade. Snapshot-Berichte erscheinen künftig wöchentlich. Nach dem Umbenennen eines Benutzers muss dessen Zwei-Faktor-Anmeldung erneut eingerichtet werden. Integrationen, die Verarbeitungsvorgänge über GET-Links auslösen, müssen auf POST wechseln.
+Nach dem Update müssen Sie sich möglicherweise erneut anmelden. Bestehende Sites behalten die klassischen Dashboards; ein System Manager kann in den System Settings auf Insights-Dashboards umstellen.
 
-Vollständige Upstream-Versionshinweise: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.55.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.56.0)`,
-    pl_PL: `Zaktualizowano ERPNext do wersji 16.55.0 z Frappe 16.56.0.
+Vollständige Upstream-Versionshinweise: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.60.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.60.0)`,
+    pl_PL: `Zaktualizowano ERPNext do wersji 16.60.0 z Frappe 16.60.2.
 
-- Dodano skonsolidowane raporty należności i zobowiązań wielu firm oraz kursy wymiany z daty raportu w księdze głównej.
-- Poprawiono wycenę zapasów, kompletację według numerów seryjnych i partii, zwroty podwykonawstwa, ilości produkcyjne, płatności i kontrolę dostępu.
-- Ulepszono drukowanie PDF, przesyłanie plików i obsługę poczty; zaktualizowano zależności przetwarzania PDF, aby usunąć problemy bezpieczeństwa.
+- Nowe pulpity przeglądowe klientów i dostawców, przebudowany formularz projektu z zarządzaniem zadaniami i kosztami, raport dziennika oraz nowe formaty wydruku raportów z podglądem pełnej strony.
+- Desk działa teraz na telefonach i tabletach, widoki list mają nowy panel filtrów, a tabele podrzędne można importować z CSV, Excela lub Arkuszy Google.
+- Dodano Studio (beta), wizualny kreator aplikacji i portali, oraz Flow, opcjonalny panel asystenta AI w Desk.
+- Setki poprawek w księgowości, sprzedaży, zakupach, magazynie, produkcji, podwykonawstwie i środkach trwałych oraz bardziej rygorystyczna kontrola uprawnień w całym systemie.
 
 **Uwagi dotyczące aktualizacji**
 
-Wymaga StartOS 0.4.2 lub nowszego. Aktualizacja bazy danych przywraca harmonogramy automatycznego uzgadniania płatności i standardową widoczność kwot słownie na wydrukach, aktualizuje odpowiednie statusy operacji Work Order i ilości otwartych Job Card, ogranicza oznaczanie adresów firmy do ról zarządzających i odbudowuje indeksy wyszukiwania artykułów w tle. Przy obszernej historii przewidź więcej czasu, a po aktualizacji sprawdź te rekordy, raporty magazynowe, wydruki i dostęp ról niestandardowych. Częstotliwość raportów migawek zmienia się na tygodniową. Zmiana nazwy użytkownika wymaga ponownej konfiguracji jego logowania dwuskładnikowego. Integracje uruchamiające operacje przetwarzania przez łącza GET muszą przejść na POST.
+Po aktualizacji może być konieczne ponowne zalogowanie. Istniejące witryny zachowują klasyczne pulpity; System Manager może przełączyć się na pulpity Insights w System Settings.
 
-Pełne informacje o wydaniach projektów źródłowych: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.55.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.56.0)`,
-    fr_FR: `ERPNext a été mis à jour vers la version 16.55.0 avec Frappe 16.56.0.
+Pełne informacje o wydaniach projektów źródłowych: [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.60.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.60.0)`,
+    fr_FR: `ERPNext a été mis à jour vers la version 16.60.0 avec Frappe 16.60.2.
 
-- Ajout de rapports consolidés des créances et dettes de plusieurs sociétés et des taux de change à la date du rapport dans le grand livre.
-- Corrections de la valorisation des stocks, de la préparation par numéro de série et lot, des retours de sous-traitance, des quantités de fabrication, des paiements et des contrôles d’accès.
-- Amélioration de l’impression PDF, des téléversements et du courrier électronique ; mise à jour des dépendances de traitement PDF pour corriger des problèmes de sécurité.
+- Nouveaux tableaux de bord de synthèse clients et fournisseurs, formulaire de projet repensé avec gestion des tâches et des coûts, rapport du journal et nouveaux formats d’impression de rapports avec aperçu pleine page.
+- Desk fonctionne désormais sur téléphones et tablettes, les vues en liste disposent d’un nouveau panneau de filtres et les tables enfants peuvent être importées depuis CSV, Excel ou Google Sheets.
+- Ajout de Studio (bêta), un constructeur visuel d’applications et de portails, et de Flow, un panneau d’assistant IA facultatif dans Desk.
+- Des centaines de corrections en comptabilité, ventes, achats, stocks, fabrication, sous-traitance et immobilisations, et des contrôles d’autorisation renforcés partout.
 
 **Points à vérifier lors de la mise à niveau**
 
-Nécessite StartOS 0.4.2 ou ultérieur. La mise à niveau de la base de données restaure les calendriers de rapprochement automatique des paiements et la visibilité standard des montants en lettres à l’impression, met à jour les états concernés des opérations Work Order et les quantités des Job Card ouvertes, réserve les indicateurs d’adresse de société aux rôles de gestion et reconstruit les index de recherche d’articles en arrière-plan. Prévoyez davantage de temps pour les historiques volumineux et vérifiez ces enregistrements, les rapports de stock, l’impression et l’accès des rôles personnalisés après la mise à jour. La fréquence des rapports d’instantanés devient hebdomadaire. Renommer un utilisateur nécessite de reconfigurer son authentification à deux facteurs. Les intégrations déclenchant des traitements par des liens GET doivent passer à POST.
+Il se peut que vous deviez vous reconnecter après la mise à jour. Les sites existants conservent les tableaux de bord classiques ; un System Manager peut passer aux tableaux de bord Insights dans System Settings.
 
-Notes de version amont complètes : [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.55.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.56.0)`,
+Notes de version amont complètes : [ERPNext](https://github.com/frappe/erpnext/releases/tag/v16.60.0), [Frappe](https://github.com/frappe/frappe/releases/tag/v16.60.0)`,
   },
   migrations: {
     up: async ({ effects }) => {},
