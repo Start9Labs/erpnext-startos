@@ -37,30 +37,30 @@ Three upstream images, unmodified, pinned by tag in `startos/manifest/index.ts` 
 for `x86_64` and `aarch64`. Each runs its stock entrypoint except where a command is named
 below.
 
-| Image     | Source           | Role                                             |
-| --------- | ---------------- | ------------------------------------------------ |
+| Image     | Source           | Role                                               |
+| --------- | ---------------- | -------------------------------------------------- |
 | `erpnext` | `frappe/erpnext` | Frappe framework + ERPNext app; nine subcontainers |
-| `mariadb` | `mariadb`        | The database holding the ledger                  |
-| `redis`   | `redis`          | Cache and job queue                              |
+| `mariadb` | `mariadb`        | The database holding the ledger                    |
+| `redis`   | `redis`          | Cache and job queue                                |
 
 ERPNext is not one process. This package runs the same process split as upstream's
 `frappe_docker` compose file, as twelve subcontainers. Attach to any of them with
 `start-cli package attach erpnext -n <name>`.
 
-| Subcontainer   | Kind    | Command                                   | Purpose                                |
-| -------------- | ------- | ----------------------------------------- | -------------------------------------- |
-| `seed-sites`   | oneshot | `cp -rn` + `chown`                        | Seeds the sites volume from the image  |
-| `configurator` | oneshot | `bench set-config …`                      | Writes bench-wide config               |
-| `smtp`         | oneshot | `bench execute frappe.client.*`           | Applies the email settings             |
-| `mariadb`      | daemon  | image entrypoint                          | Database                               |
-| `redis-cache`  | daemon  | `redis-server --port 6379`                | Frappe cache                           |
-| `redis-queue`  | daemon  | `redis-server --port 6380`                | RQ job queue and socket.io pub/sub     |
-| `backend`      | daemon  | image entrypoint (gunicorn)               | Application server                     |
-| `websocket`    | daemon  | `node …/frappe/socketio.js`               | Realtime updates                       |
-| `scheduler`    | daemon  | `bench schedule`                          | Cron-like scheduled jobs               |
-| `queue-short`  | daemon  | `bench worker --queue short,default`      | Short background jobs                  |
-| `queue-long`   | daemon  | `bench worker --queue long,default,short` | Long background jobs                   |
-| `frontend`     | daemon  | `nginx-entrypoint.sh`                     | nginx; serves assets, proxies the rest |
+| Subcontainer   | Kind    | Command                                     | Purpose                                |
+| -------------- | ------- | ------------------------------------------- | -------------------------------------- |
+| `seed-sites`   | oneshot | `cp -rn` + `chown`                          | Seeds the sites volume from the image  |
+| `configurator` | oneshot | `bench set-config …`                        | Writes bench-wide config               |
+| `smtp`         | oneshot | `bench execute frappe.client.*`             | Applies the email settings             |
+| `mariadb`      | daemon  | image entrypoint                            | Database                               |
+| `redis-cache`  | daemon  | `redis-server --port 6379 --bind 127.0.0.1` | Frappe cache                           |
+| `redis-queue`  | daemon  | `redis-server --port 6380 --bind 127.0.0.1` | RQ job queue and socket.io pub/sub     |
+| `backend`      | daemon  | image entrypoint (gunicorn)                 | Application server                     |
+| `websocket`    | daemon  | `node …/frappe/socketio.js`                 | Realtime updates                       |
+| `scheduler`    | daemon  | `bench schedule`                            | Cron-like scheduled jobs               |
+| `queue-short`  | daemon  | `bench worker --queue short,default`        | Short background jobs                  |
+| `queue-long`   | daemon  | `bench worker --queue long,default,short`   | Long background jobs                   |
+| `frontend`     | daemon  | `nginx-entrypoint.sh`                       | nginx; serves assets, proxies the rest |
 
 Install, update and the Set Administrator Password action each run their own short-lived
 copies of these outside the running service, and those are the names their logs carry:

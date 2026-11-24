@@ -14,6 +14,7 @@ import {
   mariadbFlags,
   mariadbReady,
   redisCachePort,
+  redisFlags,
   redisQueuePort,
   redisReady,
   resolveSmtp,
@@ -78,7 +79,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
       .addDaemon('redis-cache', {
         subcontainer: cacheSub,
         exec: {
-          command: sdk.useEntrypoint(['--port', String(redisCachePort)]),
+          command: sdk.useEntrypoint(redisFlags(redisCachePort)),
         },
         ready: {
           display: null,
@@ -89,7 +90,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
       .addDaemon('redis-queue', {
         subcontainer: queueSub,
         exec: {
-          command: sdk.useEntrypoint(['--port', String(redisQueuePort)]),
+          command: sdk.useEntrypoint(redisFlags(redisQueuePort)),
         },
         ready: {
           display: null,

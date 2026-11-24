@@ -14,6 +14,7 @@ import {
   mariadbFlags,
   mariadbReady,
   redisCachePort,
+  redisFlags,
   redisQueuePort,
   redisReady,
   seedSitesScript,
@@ -99,13 +100,13 @@ async function createSite(
     })
     .addDaemon('redis-cache', {
       subcontainer: cacheSub,
-      exec: { command: sdk.useEntrypoint(['--port', String(redisCachePort)]) },
+      exec: { command: sdk.useEntrypoint(redisFlags(redisCachePort)) },
       ready: { display: null, fn: redisReady(cacheSub, redisCachePort) },
       requires: [],
     })
     .addDaemon('redis-queue', {
       subcontainer: queueSub,
-      exec: { command: sdk.useEntrypoint(['--port', String(redisQueuePort)]) },
+      exec: { command: sdk.useEntrypoint(redisFlags(redisQueuePort)) },
       ready: { display: null, fn: redisReady(queueSub, redisQueuePort) },
       requires: [],
     })
@@ -209,13 +210,13 @@ async function runSiteMigrate(effects: T.Effects): Promise<void> {
     })
     .addDaemon('redis-cache', {
       subcontainer: cacheSub,
-      exec: { command: sdk.useEntrypoint(['--port', String(redisCachePort)]) },
+      exec: { command: sdk.useEntrypoint(redisFlags(redisCachePort)) },
       ready: { display: null, fn: redisReady(cacheSub, redisCachePort) },
       requires: [],
     })
     .addDaemon('redis-queue', {
       subcontainer: queueSub,
-      exec: { command: sdk.useEntrypoint(['--port', String(redisQueuePort)]) },
+      exec: { command: sdk.useEntrypoint(redisFlags(redisQueuePort)) },
       ready: { display: null, fn: redisReady(queueSub, redisQueuePort) },
       requires: [],
     })
