@@ -21,7 +21,7 @@ export const manifest = setupManifest({
       arch: ['x86_64', 'aarch64'],
     },
     redis: {
-      source: { dockerTag: 'redis:8.6-alpine' },
+      source: { dockerTag: 'redis:8.6.8-alpine' },
       arch: ['x86_64', 'aarch64'],
     },
   },

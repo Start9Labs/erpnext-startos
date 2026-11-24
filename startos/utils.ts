@@ -71,6 +71,15 @@ export const bench = (script: string): [string, ...string[]] => [
   `cd ${benchDir} && ${script}`,
 ]
 
+export const redisFlags = (port: number) => [
+  '--port',
+  String(port),
+  '--bind',
+  '127.0.0.1',
+  '--protected-mode',
+  'yes',
+]
+
 export const mariadbFlags = [
   `--bind-address=127.0.0.1`,
   `--port=${dbPort}`,

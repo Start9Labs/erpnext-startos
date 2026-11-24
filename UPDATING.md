@@ -31,7 +31,8 @@ curl -s "https://hub.docker.com/v2/repositories/frappe/erpnext/tags/<tag>" \
 `mariadb` and `redis` are pinned in the same file. Upstream's `frappe_docker` overrides
 (`overrides/compose.mariadb.yaml`, `overrides/compose.redis.yaml`) are the reference for
 which major versions ERPNext is tested against — follow them rather than tracking latest,
-and keep MariaDB on the major line upstream uses.
+and keep MariaDB on the major line upstream uses. Pin both to an exact tag, the newest
+patch of that line (`mariadb:11.8.<patch>`, `redis:8.6.<patch>-alpine`).
 
 ## Frappe framework upgrades
 
